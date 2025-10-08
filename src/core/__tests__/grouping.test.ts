@@ -6,12 +6,13 @@ describe('buildGroups', () => {
   it('should group records with matching property and amount', () => {
     const csvRecords: CsvRecord[] = [
       {
-        src: 'csv',
+        src: 'bills',
         i: 0,
         property: '123 main st',
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -24,6 +25,7 @@ describe('buildGroups', () => {
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -39,21 +41,23 @@ describe('buildGroups', () => {
   it('should handle multiple matches for the same key', () => {
     const csvRecords: CsvRecord[] = [
       {
-        src: 'csv',
+        src: 'bills',
         i: 0,
         property: '123 main st',
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
       {
-        src: 'csv',
+        src: 'bills',
         i: 1,
         property: '123 main st',
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -66,6 +70,7 @@ describe('buildGroups', () => {
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -80,12 +85,13 @@ describe('buildGroups', () => {
   it('should not group records with different properties', () => {
     const csvRecords: CsvRecord[] = [
       {
-        src: 'csv',
+        src: 'bills',
         i: 0,
         property: '123 main st',
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -98,6 +104,7 @@ describe('buildGroups', () => {
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -110,12 +117,13 @@ describe('buildGroups', () => {
   it('should not group records with different amounts', () => {
     const csvRecords: CsvRecord[] = [
       {
-        src: 'csv',
+        src: 'bills',
         i: 0,
         property: '123 main st',
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -128,6 +136,7 @@ describe('buildGroups', () => {
         amountCents: 20000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -140,12 +149,13 @@ describe('buildGroups', () => {
   it('should skip records with null amounts', () => {
     const csvRecords: CsvRecord[] = [
       {
-        src: 'csv',
+        src: 'bills',
         i: 0,
         property: '123 main st',
         amountCents: null,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -158,6 +168,7 @@ describe('buildGroups', () => {
         amountCents: null,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -170,12 +181,13 @@ describe('buildGroups', () => {
   it('should skip records with empty properties', () => {
     const csvRecords: CsvRecord[] = [
       {
-        src: 'csv',
+        src: 'bills',
         i: 0,
         property: '',
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -188,6 +200,7 @@ describe('buildGroups', () => {
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -205,21 +218,23 @@ describe('buildGroups', () => {
   it('should create multiple groups for different keys', () => {
     const csvRecords: CsvRecord[] = [
       {
-        src: 'csv',
+        src: 'bills',
         i: 0,
         property: '123 main st',
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
       {
-        src: 'csv',
+        src: 'bills',
         i: 1,
         property: '456 oak ave',
         amountCents: 20000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
@@ -232,6 +247,7 @@ describe('buildGroups', () => {
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
       {
@@ -241,6 +257,7 @@ describe('buildGroups', () => {
         amountCents: 20000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
+        typeRaw: 'Bill',
         raw: {},
       },
     ];
