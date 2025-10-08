@@ -35,8 +35,16 @@
 
 .card {
   padding: 2em;
+  justify-content: space-evenly;
+  display: flex;
 }
 
 .read-the-docs {
   color: #888;
+}
+
+.drop-zone {
+  border: 5px solid #61dafbaa;
+  height: 300px;
+  width: 300px;
 }
