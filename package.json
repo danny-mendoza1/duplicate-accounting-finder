@@ -12,8 +12,7 @@
     "test:coverage": "vitest --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format": "prettier --write ."
   },
   "dependencies": {
     "csv-parse": "^6.1.0",
