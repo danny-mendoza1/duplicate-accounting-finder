@@ -27,12 +27,13 @@ describe('parseCsvText', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
-      src: 'csv',
+      src: 'bills',
       i: 0,
       property: '123 main st',
       amountCents: 10000,
       vendorNorm: 'acme corp',
       vendorRaw: 'Acme Corp',
+      typeRaw: 'Bill',
     });
   });
 
@@ -123,6 +124,7 @@ describe('parseJsonText', () => {
       amountCents: 10000,
       vendorNorm: 'acme corp',
       vendorRaw: 'Acme Corp',
+      typeRaw: 'Bill',
     });
   });
 

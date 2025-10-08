@@ -1,5 +1,6 @@
 import type { AnyRecord } from '../types';
 import { CSV_COLS, JSON_COLS } from '../constants';
+import { BUILDIUM_CSV_COLUMNS } from '../types';
 import { formatUSDFromCents, getRaw, findHexInMemo } from '../helpers';
 
 interface ResultsTableProps {
@@ -40,16 +41,20 @@ export default function ResultsTable({ groups, vendorScope }: ResultsTableProps)
           >
             <colgroup>
               <col style={{ width: '8%' }} />
-              <col style={{ width: '14%' }} />
-              <col style={{ width: '22%' }} />
+              <col style={{ width: '7%' }} />
               <col style={{ width: '12%' }} />
-              <col style={{ width: '34%' }} />
+              <col style={{ width: '20%' }} />
+              <col style={{ width: '11%' }} />
+              <col style={{ width: '32%' }} />
               <col style={{ width: '10%' }} />
             </colgroup>
             <thead>
               <tr>
                 <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
                   Src
+                </th>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                  Type
                 </th>
                 <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
                   Date
@@ -70,29 +75,80 @@ export default function ResultsTable({ groups, vendorScope }: ResultsTableProps)
             </thead>
             <tbody>
               {group.items.map((record, i) => {
-                const isCsv = record.src === 'csv';
-                const dateKey = isCsv ? CSV_COLS.date : JSON_COLS.date;
-                const memoKey = isCsv ? CSV_COLS.memo : JSON_COLS.memo;
+                const isBills = record.src === 'bills';
+                const isBuildium = record.src === 'buildium';
+                const isJson = record.src === 'json';
+                
+                // Determine which column mapping to use based on source
+                let dateKey: string | undefined;
+                let memoKey: string | undefined;
+                
+                if (isBills) {
+                  dateKey = CSV_COLS.date;
+                  memoKey = CSV_COLS.memo;
+                } else if (isBuildium) {
+                  dateKey = BUILDIUM_CSV_COLUMNS.date;
+                  memoKey = BUILDIUM_CSV_COLUMNS.memo;
+                } else {
+                  // isJson
+                  dateKey = JSON_COLS.date;
+                  memoKey = JSON_COLS.memo;
+                }
+                
                 const dateVal = getRaw(record.raw, dateKey);
                 const memoVal = String(getRaw(record.raw, memoKey) ?? '');
                 const hex = findHexInMemo(memoVal);
+
+                // Determine display label and color
+                let sourceLabel = 'To Enter';
+                let backgroundColor = 'var(--bg-row-bills)';
+                
+                if (isBuildium) {
+                  sourceLabel = 'Buildium Export';
+                  backgroundColor = 'var(--bg-row-buildium)';
+                } else if (isJson) {
+                  sourceLabel = 'Buildium';
+                  backgroundColor = 'var(--bg-row-buildium)';
+                }
+
+                // Determine type label and styling
+                // Bill = green, EFT = blue, anything else = red (other payment types)
+                const typeValue = record.typeRaw || 'Unknown';
+                const isBill = typeValue.toLowerCase() === 'bill';
+                const isEFT = typeValue.toLowerCase() === 'eft';
+                
+                let typeColor: string;
+                if (isBill) {
+                  typeColor = 'var(--color-bill)';
+                } else if (isEFT) {
+                  typeColor = 'var(--color-eft)';
+                } else {
+                  typeColor = 'var(--color-other)';
+                }
 
                 return (
                   <tr
                     key={i}
                     style={{
-                      backgroundColor: isCsv
-                        ? 'rgba(255,255,255,0.04)' // soft light gray for CSV
-                        : 'rgba(56, 132, 255, 0.08)', // gentle blue tint for Buildium
+                      backgroundColor,
                     }}
                   >
-                    <td style={{ padding: 6 }}>{isCsv ? 'csv' : 'buildium'}</td>
+                    <td style={{ padding: 6 }}>{sourceLabel}</td>
+                    <td style={{ padding: 6 }}>
+                      <span style={{ 
+                        color: typeColor, 
+                        fontWeight: 600,
+                        fontSize: 12
+                      }}>
+                        {typeValue}
+                      </span>
+                    </td>
                     <td style={{ padding: 6 }}>{dateVal}</td>
                     <td style={{ padding: 6 }}>
                       <code>{record.property}</code>
                     </td>
                     <td style={{ padding: 6, textAlign: 'right' }}>
-                      {record.amountCents == null ? '' : formatUSDFromCents(record.amountCents)}
+                      {record.amountCents == null ? '' : formatUSDFromCents(Math.abs(record.amountCents))}
                     </td>
                     <td style={{ padding: 6 }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>

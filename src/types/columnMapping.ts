@@ -18,6 +18,7 @@ export const DEFAULT_PRESET: ColumnMappingPreset = {
     vendor: 'Vendor',
     date: 'Date',
     memo: 'Memo',
+    type: undefined, // Bills to Enter CSV doesn't have a type field - always "Bill"
   },
   jsonColumns: {
     property: 'Property',
@@ -25,7 +26,18 @@ export const DEFAULT_PRESET: ColumnMappingPreset = {
     vendor: 'PayeeName',
     date: 'Date',
     memo: 'Memo',
+    type: 'TypeDescription',
   },
+};
+
+// Column mapping for Buildium CSV export
+export const BUILDIUM_CSV_COLUMNS: ColumnMap = {
+  property: 'buildingName',
+  amount: 'amount',
+  vendor: 'payeeNameRaw',
+  date: 'entryDate',
+  memo: 'postingMemo',
+  type: 'journalCodeDescription',
 };
 
 // Future presets can be added here
