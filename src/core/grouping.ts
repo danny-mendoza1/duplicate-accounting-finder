@@ -1,4 +1,4 @@
-import type { CsvRecord, JsonRecord, UiGroup, AnyRecord } from '../types';
+import type { CsvRecord, JsonRecord, UiGroup } from '../types';
 import { keyify } from '../helpers';
 
 export function buildGroups(jsonRows: JsonRecord[], csvRows: CsvRecord[]): UiGroup[] {
