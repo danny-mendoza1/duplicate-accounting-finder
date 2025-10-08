@@ -1,22 +1,23 @@
-import { parse } from "csv-parse/browser/esm/sync";
-import { normalizeAmount, normalizeProperty, normalizeVendor } from "./normalizers";
-import type { ColumnMap, CsvRecord, JsonRecord, ParsedCsvRow } from "../types";
-
+import { parse } from 'csv-parse/browser/esm/sync';
+import { normalizeAmount, normalizeProperty, normalizeVendor } from './normalizers';
+import type { ColumnMap, CsvRecord, JsonRecord, ParsedCsvRow } from '../types';
 
 function validateColumns(row: Record<string, unknown>, columns: ColumnMap, source: string): void {
-  const required: Array<keyof Pick<ColumnMap, 'property' | 'amount' | 'vendor'>> = ['property', 'amount', 'vendor'];
-  const missing = required.filter(key => {
+  const required: Array<keyof Pick<ColumnMap, 'property' | 'amount' | 'vendor'>> = [
+    'property',
+    'amount',
+    'vendor',
+  ];
+  const missing = required.filter((key) => {
     const columnName = columns[key];
     return columnName === undefined || !(columnName in row);
   });
-  
+
   if (missing.length > 0) {
     const missingColumnNames = missing
-      .map(k => columns[k])
+      .map((k) => columns[k])
       .filter((name): name is string => name !== undefined);
-    throw new Error(
-      `${source} missing required columns: ${missingColumnNames.join(', ')}`
-    );
+    throw new Error(`${source} missing required columns: ${missingColumnNames.join(', ')}`);
   }
 }
 
@@ -24,9 +25,9 @@ export function parseCsvText(csv: string, csvColumns: ColumnMap): CsvRecord[] {
   try {
     const rows = parse(csv, {
       bom: true,
-      columns: (header: string[]) => header.map(h => h.trim()),
+      columns: (header: string[]) => header.map((h) => h.trim()),
       skip_empty_lines: true,
-      trim: true
+      trim: true,
     }) as ParsedCsvRow[];
 
     // Validate columns before processing
@@ -41,10 +42,12 @@ export function parseCsvText(csv: string, csvColumns: ColumnMap): CsvRecord[] {
       amountCents: normalizeAmount(row[csvColumns.amount]),
       vendorNorm: normalizeVendor(row[csvColumns.vendor]),
       vendorRaw: row[csvColumns.vendor] ?? 'UnknownVendor',
-      raw: row
+      raw: row,
     }));
   } catch (error) {
-    throw new Error(`CSV parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `CSV parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
   }
 }
 
@@ -52,7 +55,7 @@ export function parseJsonText(text: string, jsonColumns: ColumnMap): JsonRecord[
   const data = JSON.parse(text);
   if (!Array.isArray(data)) {
     throw new Error(
-      `Invalid JSON format. Expected an array of objects, but received: ${typeof data}`
+      `Invalid JSON format. Expected an array of objects, but received: ${typeof data}`,
     );
   }
 
@@ -68,7 +71,6 @@ export function parseJsonText(text: string, jsonColumns: ColumnMap): JsonRecord[
     amountCents: normalizeAmount(row[jsonColumns.amount]),
     vendorNorm: normalizeVendor(row[jsonColumns.vendor]),
     vendorRaw: row[jsonColumns.vendor] ?? 'UnknownVendor',
-    raw: row
+    raw: row,
   }));
-
 }

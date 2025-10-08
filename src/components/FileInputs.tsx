@@ -49,9 +49,9 @@ export default function FileInputs({
           value={jsonText}
           onChange={(e) => onJsonTextChange(e.target.value)}
           rows={8}
-          placeholder='[{"Property":"731 W. Barry Ave.","Amount":"165.00","PayeeName":"A Appliance Source Inc"}]'
-          style={{ 
-            width: "100%", 
+          placeholder='[{"Property":"1 Infinite Loop","Amount":"67.00","PayeeName":"Apple"}]'
+          style={{
+            width: "100%",
             fontFamily: "monospace",
             borderColor: jsonError ? "#c33" : undefined
           }}
@@ -60,13 +60,13 @@ export default function FileInputs({
           aria-describedby={jsonError ? "json-error" : undefined}
         />
         {jsonError && (
-          <div 
+          <div
             id="json-error"
             role="alert"
-            style={{ 
-              fontSize: 12, 
-              color: "#c33", 
-              marginTop: 4 
+            style={{
+              fontSize: 12,
+              color: "#c33",
+              marginTop: 4
             }}
           >
             {jsonError}
@@ -86,8 +86,8 @@ export default function FileInputs({
       </label>
 
       <div>
-        <button 
-          onClick={onRun} 
+        <button
+          onClick={onRun}
           disabled={isRunning}
           aria-busy={isRunning}
           title="Press Ctrl+Enter (Cmd+Enter on Mac) to run"
@@ -98,14 +98,14 @@ export default function FileInputs({
           or press Ctrl+Enter
         </span>
         {isRunning && loadingMessage && (
-          <div 
-            role="status" 
+          <div
+            role="status"
             aria-live="polite"
-            style={{ 
-              marginTop: 8, 
-              fontSize: 14, 
+            style={{
+              marginTop: 8,
+              fontSize: 14,
               color: "#555",
-              fontStyle: "italic" 
+              fontStyle: "italic"
             }}
           >
             {loadingMessage}

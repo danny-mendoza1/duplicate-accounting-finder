@@ -1,1 +1,1 @@
-export * from './grouping'
+export * from './grouping';

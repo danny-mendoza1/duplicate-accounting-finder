@@ -1,5 +1,5 @@
-import { normalizeAmount } from "./normalizers";
-import type { AppError } from "../types";
+import { normalizeAmount } from './normalizers';
+import type { AppError } from '../types';
 
 const USD = new Intl.NumberFormat('en-US', {
   style: 'currency',
