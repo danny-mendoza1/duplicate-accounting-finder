@@ -1,14 +1,25 @@
 import { useState, useCallback, useEffect } from 'react';
 import { parseJsonText, parseCsvText, createAppError } from './helpers';
 import { CSV_COLS, JSON_COLS } from './constants';
-import { buildGroups } from './core';
-import type { AnyRecord, RawRow, AppError, ErrorType } from './types';
+import { BUILDIUM_CSV_COLUMNS } from './types';
+import { buildGroups, buildGroupsCsvToCsv } from './core';
+import type { AnyRecord, RawRow, AppError, ErrorType, ComparisonMode } from './types';
 import { ERROR_TYPES } from './types';
 import { DebugPreview, ErrorDisplay, FileInputs, ResultsTable } from './components';
 
+type Theme = 'light' | 'dark';
+
 export default function App() {
+  // Theme management - default to dark
+  const [theme, setTheme] = useState<Theme>(() => {
+    const stored = localStorage.getItem('theme');
+    return (stored === 'light' || stored === 'dark') ? stored : 'dark';
+  });
+
+  const [comparisonMode, setComparisonMode] = useState<ComparisonMode>('json-csv');
   const [jsonText, setJsonText] = useState<string>('');
   const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [buildiumCsvFile, setBuildiumCsvFile] = useState<File | null>(null);
 
   const [isRunning, setIsRunning] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>('');
@@ -34,82 +45,162 @@ export default function App() {
     setDroppedRowCount(0);
 
     try {
-      // 1) Parse
-      setLoadingMessage('Parsing data files...');
-      const allCsvRecords = csvFile ? parseCsvText(await csvFile.text(), CSV_COLS) : [];
-      const allJsonRecords = jsonText.trim() ? parseJsonText(jsonText, JSON_COLS) : [];
+      if (comparisonMode === 'csv-csv') {
+        // CSV+CSV comparison mode
+        setLoadingMessage('Parsing CSV files...');
+        
+        if (!csvFile || !buildiumCsvFile) {
+          setError(
+            createAppError(
+              ERROR_TYPES.EMPTY_INPUT,
+              'Missing CSV files',
+              'Both CSV files are required for CSV+CSV comparison mode. Please upload both "Bills to Enter" and "Buildium Export" CSV files.',
+            ),
+          );
+          return;
+        }
 
-      // 2) Debug view uses RAW payloads
-      setCsvColumnKeys(
-        allCsvRecords[0] ? Object.keys(allCsvRecords[0].raw as Record<string, unknown>) : [],
-      );
-      setJsonColumnKeys(
-        allJsonRecords[0] ? Object.keys(allJsonRecords[0].raw as Record<string, unknown>) : [],
-      );
-      setFirstRowPreview(
-        (allCsvRecords[0]?.raw as RawRow) ?? (allJsonRecords[0]?.raw as RawRow) ?? null,
-      );
+        const billsRecords = parseCsvText(await csvFile.text(), CSV_COLS, 'bills');
+        const buildiumRecords = parseCsvText(await buildiumCsvFile.text(), BUILDIUM_CSV_COLUMNS, 'buildium');
 
-      if (allCsvRecords.length === 0 && allJsonRecords.length === 0) {
-        setError(
-          createAppError(
-            ERROR_TYPES.EMPTY_INPUT,
-            'No input provided',
-            'Paste JSON data in the textarea, select a CSV file, or provide both to find duplicates.',
-          ),
+        // Debug preview
+        setCsvColumnKeys(
+          billsRecords[0] ? Object.keys(billsRecords[0].raw as Record<string, unknown>) : [],
         );
-        return;
-      }
-
-      // 3) Determine vendor from JSON payload ("PayeeName") and scope CSV to it
-      setLoadingMessage('Analyzing vendor data...');
-      const jsonRecordWithVendor = allJsonRecords.find(
-        (record) => record.vendorRaw && record.vendorRaw.trim(),
-      );
-      const scope = jsonRecordWithVendor
-        ? { vendorRaw: jsonRecordWithVendor.vendorRaw, vendorNorm: jsonRecordWithVendor.vendorNorm }
-        : null;
-      setVendorScope(scope);
-
-      const scopedCsvRecords = scope
-        ? allCsvRecords.filter((record) => record.vendorNorm === scope.vendorNorm)
-        : allCsvRecords;
-
-      if (scope && scopedCsvRecords.length === 0) {
-        setError(
-          createAppError(
-            ERROR_TYPES.VENDOR_SCOPE_ERROR,
-            `No CSV rows found for vendor "${scope.vendorRaw}"`,
-            "Verify that the vendor name in your CSV 'Vendor' column matches the 'PayeeName' in your JSON data. Check for differences in capitalization, spacing, or special characters.",
-            `Looking for vendor: "${scope.vendorRaw}" (normalized: "${scope.vendorNorm}")`,
-          ),
+        setJsonColumnKeys(
+          buildiumRecords[0] ? Object.keys(buildiumRecords[0].raw as Record<string, unknown>) : [],
         );
-        return;
+        setFirstRowPreview(
+          (billsRecords[0]?.raw as RawRow) ?? (buildiumRecords[0]?.raw as RawRow) ?? null,
+        );
+
+        // Extract vendor from Buildium CSV and scope Bills CSV to it
+        setLoadingMessage('Analyzing vendor data...');
+        const buildiumRecordWithVendor = buildiumRecords.find(
+          (record) => record.vendorRaw && record.vendorRaw.trim(),
+        );
+        const scope = buildiumRecordWithVendor
+          ? { vendorRaw: buildiumRecordWithVendor.vendorRaw, vendorNorm: buildiumRecordWithVendor.vendorNorm }
+          : null;
+        setVendorScope(scope);
+
+        const scopedBillsRecords = scope
+          ? billsRecords.filter((record) => record.vendorNorm === scope.vendorNorm)
+          : billsRecords;
+
+        if (scope && scopedBillsRecords.length === 0) {
+          setError(
+            createAppError(
+              ERROR_TYPES.VENDOR_SCOPE_ERROR,
+              `No Bills CSV rows found for vendor "${scope.vendorRaw}"`,
+              "Verify that the vendor name in your 'Bills to Enter' CSV matches the vendor in the 'Buildium Export' CSV. Check for differences in capitalization, spacing, or special characters.",
+              `Looking for vendor: "${scope.vendorRaw}" (normalized: "${scope.vendorNorm}")`,
+            ),
+          );
+          return;
+        }
+
+        // Filter unusable rows
+        const usableBillsRecords = scopedBillsRecords.filter(
+          (r) => r.property !== '' && r.amountCents !== null,
+        );
+        const usableBuildiumRecords = buildiumRecords.filter(
+          (r) => r.property !== '' && r.amountCents !== null,
+        );
+        setDroppedRowCount(
+          scopedBillsRecords.length +
+            buildiumRecords.length -
+            (usableBillsRecords.length + usableBuildiumRecords.length),
+        );
+
+        // Find duplicates between the two CSVs
+        setLoadingMessage('Finding duplicates...');
+        const groupedDuplicates = buildGroupsCsvToCsv(usableBillsRecords, usableBuildiumRecords);
+
+        const uiGroups = groupedDuplicates.map((group) => ({
+          key: group.key,
+          items: [...group.csvRows, ...group.jsonRows] as AnyRecord[],
+        }));
+
+        setDuplicateGroups(uiGroups);
+      } else {
+        // JSON+CSV comparison mode (legacy)
+        setLoadingMessage('Parsing data files...');
+        const allCsvRecords = csvFile ? parseCsvText(await csvFile.text(), CSV_COLS, 'bills') : [];
+        const allJsonRecords = jsonText.trim() ? parseJsonText(jsonText, JSON_COLS) : [];
+
+        // Debug view uses RAW payloads
+        setCsvColumnKeys(
+          allCsvRecords[0] ? Object.keys(allCsvRecords[0].raw as Record<string, unknown>) : [],
+        );
+        setJsonColumnKeys(
+          allJsonRecords[0] ? Object.keys(allJsonRecords[0].raw as Record<string, unknown>) : [],
+        );
+        setFirstRowPreview(
+          (allCsvRecords[0]?.raw as RawRow) ?? (allJsonRecords[0]?.raw as RawRow) ?? null,
+        );
+
+        if (allCsvRecords.length === 0 && allJsonRecords.length === 0) {
+          setError(
+            createAppError(
+              ERROR_TYPES.EMPTY_INPUT,
+              'No input provided',
+              'Paste JSON data in the textarea, select a CSV file, or provide both to find duplicates.',
+            ),
+          );
+          return;
+        }
+
+        // Determine vendor from JSON payload ("PayeeName") and scope CSV to it
+        setLoadingMessage('Analyzing vendor data...');
+        const jsonRecordWithVendor = allJsonRecords.find(
+          (record) => record.vendorRaw && record.vendorRaw.trim(),
+        );
+        const scope = jsonRecordWithVendor
+          ? { vendorRaw: jsonRecordWithVendor.vendorRaw, vendorNorm: jsonRecordWithVendor.vendorNorm }
+          : null;
+        setVendorScope(scope);
+
+        const scopedCsvRecords = scope
+          ? allCsvRecords.filter((record) => record.vendorNorm === scope.vendorNorm)
+          : allCsvRecords;
+
+        if (scope && scopedCsvRecords.length === 0) {
+          setError(
+            createAppError(
+              ERROR_TYPES.VENDOR_SCOPE_ERROR,
+              `No CSV rows found for vendor "${scope.vendorRaw}"`,
+              "Verify that the vendor name in your CSV 'Vendor' column matches the 'PayeeName' in your JSON data. Check for differences in capitalization, spacing, or special characters.",
+              `Looking for vendor: "${scope.vendorRaw}" (normalized: "${scope.vendorNorm}")`,
+            ),
+          );
+          return;
+        }
+
+        // Filter unusable rows (after vendor scoping)
+        const usableCsvRecords = scopedCsvRecords.filter(
+          (r) => r.property !== '' && r.amountCents !== null,
+        );
+        const usableJsonRecords = allJsonRecords.filter(
+          (r) => r.property !== '' && r.amountCents !== null,
+        );
+        setDroppedRowCount(
+          scopedCsvRecords.length +
+            allJsonRecords.length -
+            (usableCsvRecords.length + usableJsonRecords.length),
+        );
+
+        // Group only keys that exist in CSV & JSON
+        setLoadingMessage('Finding duplicates...');
+        const groupedDuplicates = buildGroups(usableJsonRecords, usableCsvRecords);
+
+        const uiGroups = groupedDuplicates.map((group) => ({
+          key: group.key,
+          items: [...group.csvRows, ...group.jsonRows] as AnyRecord[],
+        }));
+
+        setDuplicateGroups(uiGroups);
       }
-
-      // 4) Filter unusable rows (after vendor scoping)
-      const usableCsvRecords = scopedCsvRecords.filter(
-        (r) => r.property !== '' && r.amountCents !== null,
-      );
-      const usableJsonRecords = allJsonRecords.filter(
-        (r) => r.property !== '' && r.amountCents !== null,
-      );
-      setDroppedRowCount(
-        scopedCsvRecords.length +
-          allJsonRecords.length -
-          (usableCsvRecords.length + usableJsonRecords.length),
-      );
-
-      // 5) Group only keys that exist in CSV & JSON
-      setLoadingMessage('Finding duplicates...');
-      const groupedDuplicates = buildGroups(usableJsonRecords, usableCsvRecords);
-
-      const uiGroups = groupedDuplicates.map((group) => ({
-        key: group.key,
-        items: [...group.csvRows, ...group.jsonRows] as AnyRecord[],
-      }));
-
-      setDuplicateGroups(uiGroups);
     } catch (e: unknown) {
       if (e instanceof Error) {
         // Determine error type based on message content
@@ -141,7 +232,18 @@ export default function App() {
       setIsRunning(false);
       setLoadingMessage('');
     }
-  }, [jsonText, csvFile]);
+  }, [jsonText, csvFile, buildiumCsvFile, comparisonMode]);
+
+  // Apply theme to document
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  // Toggle between light and dark
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   // Keyboard shortcut: Ctrl/Cmd + Enter to run
   useEffect(() => {
@@ -159,17 +261,43 @@ export default function App() {
   return (
     <div style={{ maxWidth: 960, margin: '0 auto', padding: 16 }}>
       <header style={{ marginBottom: 16 }}>
-        <h1 style={{ margin: 0 }}>Duplicate Accounting Finder (MVP)</h1>
-        <p style={{ margin: '4px 0 0' }}>Paste JSON, upload CSV, then run detection.</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+          <div style={{ flex: 1 }}>
+            <h1 style={{ margin: 0 }}>Duplicate Accounting Finder</h1>
+            <p style={{ margin: '4px 0 0' }}>Choose comparison mode, either Paste JSON and upload CSV or upload both CSVs, then run detection.</p>
+          </div>
+          
+          {/* Theme toggle button */}
+          <button
+            onClick={toggleTheme}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            style={{
+              padding: '8px 12px',
+              fontSize: '18px',
+              background: 'transparent',
+              border: '1px solid var(--border-color)',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              flexShrink: 0,
+            }}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+        </div>
       </header>
 
       <FileInputs
         jsonText={jsonText}
         onJsonTextChange={setJsonText}
         onCsvFileChange={setCsvFile}
+        onBuildiumCsvFileChange={setBuildiumCsvFile}
         isRunning={isRunning}
         loadingMessage={loadingMessage}
         onRun={handleRun}
+        comparisonMode={comparisonMode}
+        onComparisonModeChange={setComparisonMode}
       />
 
       <DebugPreview

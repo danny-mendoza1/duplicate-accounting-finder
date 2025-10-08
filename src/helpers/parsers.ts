@@ -1,6 +1,6 @@
 import { parse } from 'csv-parse/browser/esm/sync';
 import { normalizeAmount, normalizeProperty, normalizeVendor } from './normalizers';
-import type { ColumnMap, CsvRecord, JsonRecord, ParsedCsvRow } from '../types';
+import type { ColumnMap, CsvRecord, JsonRecord, ParsedCsvRow, RecordSource } from '../types';
 
 function validateColumns(row: Record<string, unknown>, columns: ColumnMap, source: string): void {
   const required: Array<keyof Pick<ColumnMap, 'property' | 'amount' | 'vendor'>> = [
@@ -21,7 +21,7 @@ function validateColumns(row: Record<string, unknown>, columns: ColumnMap, sourc
   }
 }
 
-export function parseCsvText(csv: string, csvColumns: ColumnMap): CsvRecord[] {
+export function parseCsvText(csv: string, csvColumns: ColumnMap, source: RecordSource = 'bills'): CsvRecord[] {
   try {
     const rows = parse(csv, {
       bom: true,
@@ -35,15 +35,21 @@ export function parseCsvText(csv: string, csvColumns: ColumnMap): CsvRecord[] {
       validateColumns(rows[0], csvColumns, 'CSV');
     }
 
-    return rows.map((row, index) => ({
-      src: 'csv',
-      i: index,
-      property: normalizeProperty(row[csvColumns.property]),
-      amountCents: normalizeAmount(row[csvColumns.amount]),
-      vendorNorm: normalizeVendor(row[csvColumns.vendor]),
-      vendorRaw: row[csvColumns.vendor] ?? 'UnknownVendor',
-      raw: row,
-    }));
+    return rows.map((row, index) => {
+      const typeColumn = csvColumns.type;
+      const typeRaw = typeColumn && typeColumn in row ? String(row[typeColumn]) : 'Bill';
+      
+      return {
+        src: source,
+        i: index,
+        property: normalizeProperty(row[csvColumns.property]),
+        amountCents: normalizeAmount(row[csvColumns.amount]),
+        vendorNorm: normalizeVendor(row[csvColumns.vendor]),
+        vendorRaw: row[csvColumns.vendor] ?? 'UnknownVendor',
+        typeRaw,
+        raw: row,
+      };
+    });
   } catch (error) {
     throw new Error(
       `CSV parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -64,13 +70,19 @@ export function parseJsonText(text: string, jsonColumns: ColumnMap): JsonRecord[
     validateColumns(data[0], jsonColumns, 'JSON');
   }
 
-  return data.map((row, index) => ({
-    src: 'json',
-    i: index,
-    property: normalizeProperty(row[jsonColumns.property]),
-    amountCents: normalizeAmount(row[jsonColumns.amount]),
-    vendorNorm: normalizeVendor(row[jsonColumns.vendor]),
-    vendorRaw: row[jsonColumns.vendor] ?? 'UnknownVendor',
-    raw: row,
-  }));
+  return data.map((row, index) => {
+    const typeColumn = jsonColumns.type;
+    const typeRaw = typeColumn && typeColumn in row ? String(row[typeColumn]) : 'Bill';
+    
+    return {
+      src: 'json',
+      i: index,
+      property: normalizeProperty(row[jsonColumns.property]),
+      amountCents: normalizeAmount(row[jsonColumns.amount]),
+      vendorNorm: normalizeVendor(row[jsonColumns.vendor]),
+      vendorRaw: row[jsonColumns.vendor] ?? 'UnknownVendor',
+      typeRaw,
+      raw: row,
+    };
+  });
 }

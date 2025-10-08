@@ -2,13 +2,16 @@
 export type RawRow = Record<string, unknown>;
 export type ParsedCsvRow = Record<string, string>;
 
+export type RecordSource = 'bills' | 'buildium' | 'json';
+
 export type CsvRecord = {
-  src: 'csv';
+  src: RecordSource;
   i: number;
   property: string;
   amountCents: number | null;
   vendorNorm: string;
   vendorRaw: string;
+  typeRaw: string;
   raw: RawRow;
 };
 
@@ -19,6 +22,7 @@ export type JsonRecord = {
   amountCents: number | null;
   vendorNorm: string;
   vendorRaw: string;
+  typeRaw: string;
   raw: RawRow;
 };
 
@@ -28,6 +32,7 @@ export type ColumnMap = {
   vendor: string;
   date?: string;
   memo?: string;
+  type?: string;
 };
 
 export type UiGroup = {
@@ -37,6 +42,8 @@ export type UiGroup = {
 };
 
 export type AnyRecord = CsvRecord | JsonRecord;
+
+export type ComparisonMode = 'json-csv' | 'csv-csv';
 
 // Re-export from other type files
 export * from './columnMapping';
