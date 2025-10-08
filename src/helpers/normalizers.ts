@@ -1,11 +1,19 @@
-import type { CsvRecord, RawRow } from "../types";
+import type { CsvRecord } from "../types";
 
-export function normalizeAmount(value: string): number | null {
-  if (value === undefined || value === null || value === '') return null;
+export function normalizeAmount(value: unknown): number | null {
+  if (value === undefined || value === null || value === "") return null;
+  let s = String(value).trim();
 
-  const n = typeof value === 'number' ? value : Number(String(value).replace(/[$,]/g, ''));
+  // Handle accounting negatives
+  // (1) parentheses: (123.45) => -123.45
+  let sign = 1;
+  if (/^\(.*\)$/.test(s)) { sign = -1; s = s.slice(1, -1); }
+  // (2) trailing minus: 123.45- => -123.45
+  if (/-$/.test(s)) { sign = -1; s = s.slice(0, -1); }
+
+  const n = Number(s.replace(/[$,]/g, ""));
   if (Number.isNaN(n)) return null;
-  return Math.round(n * 100); // integer cents
+  return Math.round(sign * n * 100);
 }
 
 export function normalizeProperty(value: string): string {

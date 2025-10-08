@@ -1,9 +1,11 @@
 # Duplicate Accounting Finder
+
 ![Build](https://img.shields.io/github/actions/workflow/status/danny-mendoza1/duplicate-accounting-finder/ci.yml?branch=main)
 ![License](https://img.shields.io/github/license/danny-mendoza1/duplicate-accounting-finder)
 ![Code Style](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)
 ![TypeScript](https://img.shields.io/badge/language-TypeScript-3178c6?logo=typescript&logoColor=white)
 
+**[🚀 Live Demo](https://danny-mendoza1.github.io/duplicate-accounting-finder/)** | [Report Bug](https://github.com/danny-mendoza1/duplicate-accounting-finder/issues) | [Request Feature](https://github.com/danny-mendoza1/duplicate-accounting-finder/issues)
 
 A client-side web application for detecting and grouping duplicate accounting entries across CSV and JSON exports.  
 All processing happens securely in the browser — **no data leaves the device**.
