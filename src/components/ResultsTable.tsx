@@ -112,9 +112,19 @@ export default function ResultsTable({ groups, vendorScope }: ResultsTableProps)
                 }
 
                 // Determine type label and styling
-                const isPayment = record.typeRaw === 'EFT' || record.typeRaw === 'Payment';
-                const typeLabel = isPayment ? 'EFT' : 'Bill';
-                const typeColor = isPayment ? 'var(--color-eft)' : 'var(--color-bill)';
+                // Bill = green, EFT = blue, anything else = red (other payment types)
+                const typeValue = record.typeRaw || 'Unknown';
+                const isBill = typeValue.toLowerCase() === 'bill';
+                const isEFT = typeValue.toLowerCase() === 'eft';
+                
+                let typeColor: string;
+                if (isBill) {
+                  typeColor = 'var(--color-bill)';
+                } else if (isEFT) {
+                  typeColor = 'var(--color-eft)';
+                } else {
+                  typeColor = 'var(--color-other)';
+                }
 
                 return (
                   <tr
@@ -130,7 +140,7 @@ export default function ResultsTable({ groups, vendorScope }: ResultsTableProps)
                         fontWeight: 600,
                         fontSize: 12
                       }}>
-                        {typeLabel}
+                        {typeValue}
                       </span>
                     </td>
                     <td style={{ padding: 6 }}>{dateVal}</td>

@@ -178,7 +178,7 @@ export default function FileInputs({
         <>
           <label htmlFor="bills-csv-input">
             <div style={{ fontSize: 12, marginBottom: 4, fontWeight: "bold" }}>
-              Upload CSV #1: Bills to Enter
+              Upload CSV #1: Bills to Enter (Vendor Invoices)
             </div>
             <input
               id="bills-csv-input"

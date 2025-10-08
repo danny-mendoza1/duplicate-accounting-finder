@@ -16,7 +16,7 @@ export default function App() {
     return (stored === 'light' || stored === 'dark') ? stored : 'dark';
   });
 
-  const [comparisonMode, setComparisonMode] = useState<ComparisonMode>('json-csv');
+  const [comparisonMode, setComparisonMode] = useState<ComparisonMode>('csv-csv');
   const [jsonText, setJsonText] = useState<string>('');
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [buildiumCsvFile, setBuildiumCsvFile] = useState<File | null>(null);

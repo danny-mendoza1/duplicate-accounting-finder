@@ -22,9 +22,10 @@
   --accent-color: #646cff;
   --accent-hover: #535bf2;
   
-  /* Type colors for Bill vs EFT */
-  --color-eft: #00E5FF;
+  /* Type colors for Bill vs EFT vs Other */
   --color-bill: #39FF14;
+  --color-eft: #00E5FF;
+  --color-other: #FF6B6B;
   
   /* Row backgrounds */
   --bg-row-bills: rgba(255, 255, 255, 0.04);
@@ -54,9 +55,10 @@
   --accent-color: #0066cc;
   --accent-hover: #0052a3;
   
-  /* Type colors for Bill vs EFT */
-  --color-eft: #0047FF;
+  /* Type colors for Bill vs EFT vs Other */
   --color-bill: #00751A;
+  --color-eft: #0047FF;
+  --color-other: #D32F2F;
   
   /* Row backgrounds */
   --bg-row-bills: rgba(0, 0, 0, 0.02);
