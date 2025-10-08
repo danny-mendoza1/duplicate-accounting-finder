@@ -1,4 +1,4 @@
-import type { ColumnMap } from "./index";
+import type { ColumnMap } from './index';
 
 export interface ColumnMappingPreset {
   id: string;
@@ -29,10 +29,8 @@ export const DEFAULT_PRESET: ColumnMappingPreset = {
 };
 
 // Future presets can be added here
-export const COLUMN_PRESETS: ColumnMappingPreset[] = [
-  DEFAULT_PRESET,
-];
+export const COLUMN_PRESETS: ColumnMappingPreset[] = [DEFAULT_PRESET];
 
 export function getPresetById(id: string): ColumnMappingPreset | undefined {
-  return COLUMN_PRESETS.find(preset => preset.id === id);
+  return COLUMN_PRESETS.find((preset) => preset.id === id);
 }
