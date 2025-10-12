@@ -2,10 +2,9 @@ import type { AppError } from '../types';
 
 interface ErrorDisplayProps {
   error: AppError | null;
-  droppedCount: number;
 }
 
-export default function ErrorDisplay({ error, droppedCount }: ErrorDisplayProps) {
+export function ErrorDisplay({ error }: ErrorDisplayProps) {
   if (error) {
     return (
       <div
@@ -29,14 +28,6 @@ export default function ErrorDisplay({ error, droppedCount }: ErrorDisplayProps)
         {error.details && (
           <div style={{ fontSize: 12, marginTop: 4, opacity: 0.8 }}>{error.details}</div>
         )}
-      </div>
-    );
-  }
-
-  if (droppedCount > 0) {
-    return (
-      <div style={{ fontSize: 12, color: '#555', marginBottom: 12 }}>
-        Skipped {droppedCount} row(s) missing property or amount.
       </div>
     );
   }

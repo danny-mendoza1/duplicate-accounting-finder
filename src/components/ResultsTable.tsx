@@ -1,15 +1,14 @@
-import type { AnyRecord } from '../types';
-import { CSV_COLS, JSON_COLS } from '../constants';
-import { BUILDIUM_CSV_COLUMNS } from '../types';
+import type { CsvRecord } from '../types';
+import { BILLS_CSV_COLUMNS, BUILDIUM_CSV_COLUMNS } from '../constants';
 import { formatUSDFromCents, getRaw, getMemoColor, extractMemoNumber } from '../helpers';
 
 interface ResultsTableProps {
-  groups: Array<{ key: string; items: AnyRecord[] }>;
+  groups: Array<{ key: string; items: CsvRecord[] }>;
   vendorScope?: { vendorRaw: string; vendorNorm: string } | null;
   showHeader?: boolean;
 }
 
-export default function ResultsTable({ groups, vendorScope = null, showHeader = true }: ResultsTableProps) {
+export function ResultsTable({ groups, vendorScope = null, showHeader = true }: ResultsTableProps) {
   return (
     <section>
       {showHeader && (
@@ -88,22 +87,18 @@ export default function ResultsTable({ groups, vendorScope = null, showHeader = 
               {group.items.map((record, i) => {
                 const isBills = record.src === 'bills';
                 const isBuildium = record.src === 'buildium';
-                const isJson = record.src === 'json';
                 
                 // Determine which column mapping to use based on source
                 let dateKey: string | undefined;
                 let memoKey: string | undefined;
                 
                 if (isBills) {
-                  dateKey = CSV_COLS.date;
-                  memoKey = CSV_COLS.memo;
-                } else if (isBuildium) {
+                  dateKey = BILLS_CSV_COLUMNS.date;
+                  memoKey = BILLS_CSV_COLUMNS.memo;
+                } else {
+                  // isBuildium
                   dateKey = BUILDIUM_CSV_COLUMNS.date;
                   memoKey = BUILDIUM_CSV_COLUMNS.memo;
-                } else {
-                  // isJson
-                  dateKey = JSON_COLS.date;
-                  memoKey = JSON_COLS.memo;
                 }
                 
                 const dateVal = getRaw(record.raw, dateKey);
@@ -117,9 +112,6 @@ export default function ResultsTable({ groups, vendorScope = null, showHeader = 
                 
                 if (isBuildium) {
                   sourceLabel = 'Buildium Export';
-                  backgroundColor = 'var(--bg-row-buildium)';
-                } else if (isJson) {
-                  sourceLabel = 'Buildium';
                   backgroundColor = 'var(--bg-row-buildium)';
                 }
 
