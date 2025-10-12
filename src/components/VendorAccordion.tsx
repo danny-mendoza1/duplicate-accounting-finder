@@ -1,15 +1,32 @@
-import { useState } from 'react';
-import type { VendorGroup, AnyRecord } from '../types';
-import ResultsTable from './ResultsTable';
-import VendorsWithoutDuplicatesTable from './VendorsWithoutDuplicatesTable';
+import { useState, useMemo } from 'react';
+import type { VendorGroup } from '../types';
+import { ResultsTable } from './ResultsTable';
+import { VendorsWithoutDuplicatesTable } from './VendorsWithoutDuplicatesTable';
 
 interface VendorAccordionProps {
   vendorGroups: VendorGroup[];
   vendorsWithoutDuplicates?: string[];
 }
 
-export default function VendorAccordion({ vendorGroups, vendorsWithoutDuplicates = [] }: VendorAccordionProps) {
+export function VendorAccordion({ vendorGroups, vendorsWithoutDuplicates = [] }: VendorAccordionProps) {
   const [expandedVendors, setExpandedVendors] = useState<Set<string>>(new Set());
+
+  const totalDuplicateGroups = useMemo(
+    () => vendorGroups.reduce((sum, v) => sum + v.duplicateGroupCount, 0),
+    [vendorGroups]
+  );
+
+  // Memoize the transformed vendor groups to avoid recreating on every render
+  const transformedVendorGroups = useMemo(
+    () => vendorGroups.map((vendorGroup) => ({
+      ...vendorGroup,
+      transformedGroups: vendorGroup.groups.map((group) => ({
+        key: group.key,
+        items: [...group.billsRows, ...group.buildiumRows],
+      })),
+    })),
+    [vendorGroups]
+  );
 
   const toggleVendor = (vendorNorm: string) => {
     setExpandedVendors((prev) => {
@@ -22,8 +39,6 @@ export default function VendorAccordion({ vendorGroups, vendorsWithoutDuplicates
       return next;
     });
   };
-
-  const totalDuplicateGroups = vendorGroups.reduce((sum, v) => sum + v.duplicateGroupCount, 0);
 
   return (
     <section>
@@ -42,7 +57,7 @@ export default function VendorAccordion({ vendorGroups, vendorsWithoutDuplicates
       </div>
 
       {/* Vendors with duplicates */}
-      {vendorGroups.map((vendorGroup) => {
+      {transformedVendorGroups.map((vendorGroup) => {
         const isExpanded = expandedVendors.has(vendorGroup.vendorNorm);
 
         return (
@@ -89,10 +104,7 @@ export default function VendorAccordion({ vendorGroups, vendorsWithoutDuplicates
             {isExpanded && (
               <div style={{ padding: 12, borderTop: '1px solid var(--border-color)' }}>
                 <ResultsTable
-                  groups={vendorGroup.groups.map((group) => ({
-                    key: group.key,
-                    items: [...group.csvRows, ...group.jsonRows] as AnyRecord[],
-                  }))}
+                  groups={vendorGroup.transformedGroups}
                   showHeader={false}
                 />
               </div>

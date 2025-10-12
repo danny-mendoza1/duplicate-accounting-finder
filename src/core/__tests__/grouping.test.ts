@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { buildGroups } from '../grouping';
-import type { CsvRecord, JsonRecord } from '../../types';
+import { buildGroupsCsvToCsv } from '../grouping';
+import type { CsvRecord } from '../../types';
 
-describe('buildGroups', () => {
-  it('should group records with matching property and amount', () => {
-    const csvRecords: CsvRecord[] = [
+describe('buildGroupsCsvToCsv', () => {
+  it('should group bills records with matching buildium records', () => {
+    const billsRecords: CsvRecord[] = [
       {
         src: 'bills',
         i: 0,
@@ -17,9 +17,9 @@ describe('buildGroups', () => {
       },
     ];
 
-    const jsonRecords: JsonRecord[] = [
+    const buildiumRecords: CsvRecord[] = [
       {
-        src: 'json',
+        src: 'buildium',
         i: 0,
         property: '123 main st',
         amountCents: 10000,
@@ -30,20 +30,21 @@ describe('buildGroups', () => {
       },
     ];
 
-    const groups = buildGroups(jsonRecords, csvRecords);
+    const { validGroups, invalidBills } = buildGroupsCsvToCsv(billsRecords, buildiumRecords);
 
-    expect(groups).toHaveLength(1);
-    expect(groups[0].csvRows).toHaveLength(1);
-    expect(groups[0].jsonRows).toHaveLength(1);
-    expect(groups[0].key).toBe('acme corp|123 main st|10000');
+    expect(validGroups).toHaveLength(1);
+    expect(validGroups[0].billsRows).toHaveLength(1);
+    expect(validGroups[0].buildiumRows).toHaveLength(1);
+    expect(validGroups[0].key).toBe('acme corp|123 main st|10000');
+    expect(invalidBills).toHaveLength(0);
   });
 
-  it('should handle multiple matches for the same key', () => {
-    const csvRecords: CsvRecord[] = [
+  it('should separate invalid bills', () => {
+    const billsRecords: CsvRecord[] = [
       {
         src: 'bills',
         i: 0,
-        property: '123 main st',
+        property: '',
         amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
@@ -54,7 +55,7 @@ describe('buildGroups', () => {
         src: 'bills',
         i: 1,
         property: '123 main st',
-        amountCents: 10000,
+        amountCents: null,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
         typeRaw: 'Bill',
@@ -62,28 +63,16 @@ describe('buildGroups', () => {
       },
     ];
 
-    const jsonRecords: JsonRecord[] = [
-      {
-        src: 'json',
-        i: 0,
-        property: '123 main st',
-        amountCents: 10000,
-        vendorNorm: 'acme corp',
-        vendorRaw: 'Acme Corp',
-        typeRaw: 'Bill',
-        raw: {},
-      },
-    ];
+    const buildiumRecords: CsvRecord[] = [];
 
-    const groups = buildGroups(jsonRecords, csvRecords);
+    const { validGroups, invalidBills } = buildGroupsCsvToCsv(billsRecords, buildiumRecords);
 
-    expect(groups).toHaveLength(1);
-    expect(groups[0].csvRows).toHaveLength(2);
-    expect(groups[0].jsonRows).toHaveLength(1);
+    expect(validGroups).toHaveLength(0);
+    expect(invalidBills).toHaveLength(2);
   });
 
   it('should not group records with different properties', () => {
-    const csvRecords: CsvRecord[] = [
+    const billsRecords: CsvRecord[] = [
       {
         src: 'bills',
         i: 0,
@@ -96,9 +85,9 @@ describe('buildGroups', () => {
       },
     ];
 
-    const jsonRecords: JsonRecord[] = [
+    const buildiumRecords: CsvRecord[] = [
       {
-        src: 'json',
+        src: 'buildium',
         i: 0,
         property: '456 oak ave',
         amountCents: 10000,
@@ -109,13 +98,13 @@ describe('buildGroups', () => {
       },
     ];
 
-    const groups = buildGroups(jsonRecords, csvRecords);
+    const { validGroups } = buildGroupsCsvToCsv(billsRecords, buildiumRecords);
 
-    expect(groups).toHaveLength(0);
+    expect(validGroups).toHaveLength(0);
   });
 
   it('should not group records with different amounts', () => {
-    const csvRecords: CsvRecord[] = [
+    const billsRecords: CsvRecord[] = [
       {
         src: 'bills',
         i: 0,
@@ -128,9 +117,9 @@ describe('buildGroups', () => {
       },
     ];
 
-    const jsonRecords: JsonRecord[] = [
+    const buildiumRecords: CsvRecord[] = [
       {
-        src: 'json',
+        src: 'buildium',
         i: 0,
         property: '123 main st',
         amountCents: 20000,
@@ -141,82 +130,19 @@ describe('buildGroups', () => {
       },
     ];
 
-    const groups = buildGroups(jsonRecords, csvRecords);
+    const { validGroups } = buildGroupsCsvToCsv(billsRecords, buildiumRecords);
 
-    expect(groups).toHaveLength(0);
-  });
-
-  it('should skip records with null amounts', () => {
-    const csvRecords: CsvRecord[] = [
-      {
-        src: 'bills',
-        i: 0,
-        property: '123 main st',
-        amountCents: null,
-        vendorNorm: 'acme corp',
-        vendorRaw: 'Acme Corp',
-        typeRaw: 'Bill',
-        raw: {},
-      },
-    ];
-
-    const jsonRecords: JsonRecord[] = [
-      {
-        src: 'json',
-        i: 0,
-        property: '123 main st',
-        amountCents: null,
-        vendorNorm: 'acme corp',
-        vendorRaw: 'Acme Corp',
-        typeRaw: 'Bill',
-        raw: {},
-      },
-    ];
-
-    const groups = buildGroups(jsonRecords, csvRecords);
-
-    expect(groups).toHaveLength(0);
-  });
-
-  it('should skip records with empty properties', () => {
-    const csvRecords: CsvRecord[] = [
-      {
-        src: 'bills',
-        i: 0,
-        property: '',
-        amountCents: 10000,
-        vendorNorm: 'acme corp',
-        vendorRaw: 'Acme Corp',
-        typeRaw: 'Bill',
-        raw: {},
-      },
-    ];
-
-    const jsonRecords: JsonRecord[] = [
-      {
-        src: 'json',
-        i: 0,
-        property: '',
-        amountCents: 10000,
-        vendorNorm: 'acme corp',
-        vendorRaw: 'Acme Corp',
-        typeRaw: 'Bill',
-        raw: {},
-      },
-    ];
-
-    const groups = buildGroups(jsonRecords, csvRecords);
-
-    expect(groups).toHaveLength(0);
+    expect(validGroups).toHaveLength(0);
   });
 
   it('should handle empty inputs', () => {
-    const groups = buildGroups([], []);
-    expect(groups).toHaveLength(0);
+    const { validGroups, invalidBills } = buildGroupsCsvToCsv([], []);
+    expect(validGroups).toHaveLength(0);
+    expect(invalidBills).toHaveLength(0);
   });
 
-  it('should create multiple groups for different keys', () => {
-    const csvRecords: CsvRecord[] = [
+  it('should handle multiple matches for the same key', () => {
+    const billsRecords: CsvRecord[] = [
       {
         src: 'bills',
         i: 0,
@@ -230,8 +156,8 @@ describe('buildGroups', () => {
       {
         src: 'bills',
         i: 1,
-        property: '456 oak ave',
-        amountCents: 20000,
+        property: '123 main st',
+        amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
         typeRaw: 'Bill',
@@ -239,9 +165,9 @@ describe('buildGroups', () => {
       },
     ];
 
-    const jsonRecords: JsonRecord[] = [
+    const buildiumRecords: CsvRecord[] = [
       {
-        src: 'json',
+        src: 'buildium',
         i: 0,
         property: '123 main st',
         amountCents: 10000,
@@ -250,11 +176,22 @@ describe('buildGroups', () => {
         typeRaw: 'Bill',
         raw: {},
       },
+    ];
+
+    const { validGroups } = buildGroupsCsvToCsv(billsRecords, buildiumRecords);
+
+    expect(validGroups).toHaveLength(1);
+    expect(validGroups[0].billsRows).toHaveLength(2);
+    expect(validGroups[0].buildiumRows).toHaveLength(1);
+  });
+
+  it('should use absolute values for amount matching', () => {
+    const billsRecords: CsvRecord[] = [
       {
-        src: 'json',
-        i: 1,
-        property: '456 oak ave',
-        amountCents: 20000,
+        src: 'bills',
+        i: 0,
+        property: '123 main st',
+        amountCents: 10000,
         vendorNorm: 'acme corp',
         vendorRaw: 'Acme Corp',
         typeRaw: 'Bill',
@@ -262,10 +199,23 @@ describe('buildGroups', () => {
       },
     ];
 
-    const groups = buildGroups(jsonRecords, csvRecords);
+    const buildiumRecords: CsvRecord[] = [
+      {
+        src: 'buildium',
+        i: 0,
+        property: '123 main st',
+        amountCents: -10000,
+        vendorNorm: 'acme corp',
+        vendorRaw: 'Acme Corp',
+        typeRaw: 'Payment',
+        raw: {},
+      },
+    ];
 
-    expect(groups).toHaveLength(2);
-    expect(groups[0].key).toBe('acme corp|123 main st|10000');
-    expect(groups[1].key).toBe('acme corp|456 oak ave|20000');
+    const { validGroups } = buildGroupsCsvToCsv(billsRecords, buildiumRecords);
+
+    expect(validGroups).toHaveLength(1);
+    expect(validGroups[0].billsRows[0].amountCents).toBe(10000);
+    expect(validGroups[0].buildiumRows[0].amountCents).toBe(-10000);
   });
 });

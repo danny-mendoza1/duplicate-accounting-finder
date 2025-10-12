@@ -1,8 +1,8 @@
 // Core data types
-export type RawRow = Record<string, unknown>;
+export type CsvRawRow = Record<string, string | number | null | undefined>;
 export type ParsedCsvRow = Record<string, string>;
 
-export type RecordSource = 'bills' | 'buildium' | 'json';
+export type RecordSource = 'bills' | 'buildium';
 
 export type CsvRecord = {
   src: RecordSource;
@@ -12,18 +12,7 @@ export type CsvRecord = {
   vendorNorm: string;
   vendorRaw: string;
   typeRaw: string;
-  raw: RawRow;
-};
-
-export type JsonRecord = {
-  src: 'json';
-  i: number;
-  property: string;
-  amountCents: number | null;
-  vendorNorm: string;
-  vendorRaw: string;
-  typeRaw: string;
-  raw: RawRow;
+  raw: CsvRawRow;
 };
 
 export type ColumnMap = {
@@ -37,8 +26,8 @@ export type ColumnMap = {
 
 export type UiGroup = {
   key: string;
-  csvRows: CsvRecord[];
-  jsonRows: JsonRecord[];
+  billsRows: CsvRecord[];
+  buildiumRows: CsvRecord[];
 };
 
 export type VendorGroup = {
@@ -50,10 +39,16 @@ export type VendorGroup = {
   duplicateGroupCount: number;
 };
 
-export type AnyRecord = CsvRecord | JsonRecord;
+// Result types
+export type ParseFilesResult = {
+  billsRecords: CsvRecord[];
+  buildiumRecords: CsvRecord[];
+};
 
-export type ComparisonMode = 'json-csv' | 'csv-csv';
+export type DuplicateDetectionResult = {
+  validGroups: UiGroup[];
+  invalidBills: CsvRecord[];
+};
 
 // Re-export from other type files
-export * from './columnMapping';
 export * from './errors';

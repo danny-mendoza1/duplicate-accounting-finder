@@ -4,7 +4,7 @@ interface InvalidBillsLogProps {
   invalidBills: CsvRecord[];
 }
 
-export default function InvalidBillsLog({ invalidBills }: InvalidBillsLogProps) {
+export function InvalidBillsLog({ invalidBills }: InvalidBillsLogProps) {
   if (invalidBills.length === 0) return null;
 
   return (

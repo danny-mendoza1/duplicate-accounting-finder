@@ -4,7 +4,7 @@ interface VendorsWithoutDuplicatesTableProps {
   vendors: string[];
 }
 
-export default function VendorsWithoutDuplicatesTable({ vendors }: VendorsWithoutDuplicatesTableProps) {
+export function VendorsWithoutDuplicatesTable({ vendors }: VendorsWithoutDuplicatesTableProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (vendors.length === 0) return null;

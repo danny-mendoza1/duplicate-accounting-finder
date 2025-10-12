@@ -1,6 +1,6 @@
 import { parse } from 'csv-parse/browser/esm/sync';
 import { normalizeAmount, normalizeProperty, normalizeVendor } from './normalizers';
-import type { ColumnMap, CsvRecord, JsonRecord, ParsedCsvRow, RecordSource } from '../types';
+import type { ColumnMap, CsvRecord, ParsedCsvRow, RecordSource } from '../types';
 
 function validateColumns(row: Record<string, unknown>, columns: ColumnMap, source: string): void {
   const required: Array<keyof Pick<ColumnMap, 'property' | 'amount' | 'vendor'>> = [
@@ -55,34 +55,4 @@ export function parseCsvText(csv: string, csvColumns: ColumnMap, source: RecordS
       `CSV parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
     );
   }
-}
-
-export function parseJsonText(text: string, jsonColumns: ColumnMap): JsonRecord[] {
-  const data = JSON.parse(text);
-  if (!Array.isArray(data)) {
-    throw new Error(
-      `Invalid JSON format. Expected an array of objects, but received: ${typeof data}`,
-    );
-  }
-
-  // Validate columns before processing
-  if (data.length > 0) {
-    validateColumns(data[0], jsonColumns, 'JSON');
-  }
-
-  return data.map((row, index) => {
-    const typeColumn = jsonColumns.type;
-    const typeRaw = typeColumn && typeColumn in row ? String(row[typeColumn]) : 'Bill';
-    
-    return {
-      src: 'json',
-      i: index,
-      property: normalizeProperty(row[jsonColumns.property]),
-      amountCents: normalizeAmount(row[jsonColumns.amount]),
-      vendorNorm: normalizeVendor(row[jsonColumns.vendor]),
-      vendorRaw: row[jsonColumns.vendor] ?? 'UnknownVendor',
-      typeRaw,
-      raw: row,
-    };
-  });
 }

@@ -29,7 +29,7 @@ export function normalizeProperty(value: string): string {
     .toLowerCase();
 }
 
-export function normalizeVendor(value: string) {
+export function normalizeVendor(value: string): string {
   return String(value ?? '')
     .trim()
     .replace(/\s+/g, ' ')
