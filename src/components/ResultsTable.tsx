@@ -5,30 +5,37 @@ import { formatUSDFromCents, getRaw, findHexInMemo } from '../helpers';
 
 interface ResultsTableProps {
   groups: Array<{ key: string; items: AnyRecord[] }>;
-  vendorScope: { vendorRaw: string; vendorNorm: string } | null;
+  vendorScope?: { vendorRaw: string; vendorNorm: string } | null;
+  showHeader?: boolean;
 }
 
-export default function ResultsTable({ groups, vendorScope }: ResultsTableProps) {
+export default function ResultsTable({ groups, vendorScope = null, showHeader = true }: ResultsTableProps) {
   return (
     <section>
-      <h2 style={{ marginTop: 0 }}>Results for {vendorScope?.vendorRaw}</h2>
-      <div role="status" aria-live="polite" aria-atomic="true" style={{ marginBottom: 8 }}>
-        {groups.length === 0
-          ? 'No duplicates found (or nothing to process).'
-          : `${groups.length} duplicate group(s) found.`}
-      </div>
+      {showHeader && (
+        <>
+          <h2 style={{ marginTop: 0 }}>
+            {vendorScope ? `Results for ${vendorScope.vendorRaw}` : 'Results'}
+          </h2>
+          <div role="status" aria-live="polite" aria-atomic="true" style={{ marginBottom: 8 }}>
+            {groups.length === 0
+              ? 'No duplicates found (or nothing to process).'
+              : `${groups.length} duplicate group(s) found.`}
+          </div>
+        </>
+      )}
 
       {groups.map((group, idx) => (
         <div
           key={group.key}
           style={{
-            border: '1px solid #ddd',
+            border: '1px solid var(--border-color)',
             borderRadius: 8,
             padding: 8,
             marginBottom: 12,
           }}
         >
-          <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>
             Group {idx + 1} • key: <code>{group.key}</code> • count: {group.items.length}
           </div>
           <table
@@ -50,25 +57,25 @@ export default function ResultsTable({ groups, vendorScope }: ResultsTableProps)
             </colgroup>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Src
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Type
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Date
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Property
                 </th>
-                <th style={{ textAlign: 'right', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'right', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Amount
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Memo
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Vendor
                 </th>
               </tr>

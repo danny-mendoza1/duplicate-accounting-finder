@@ -2,10 +2,10 @@ import { useState, useCallback, useEffect } from 'react';
 import { parseJsonText, parseCsvText, createAppError } from './helpers';
 import { CSV_COLS, JSON_COLS } from './constants';
 import { BUILDIUM_CSV_COLUMNS } from './types';
-import { buildGroups, buildGroupsCsvToCsv } from './core';
-import type { AnyRecord, RawRow, AppError, ErrorType, ComparisonMode } from './types';
+import { buildGroups, buildGroupsCsvToCsv, groupByVendor } from './core';
+import type { AnyRecord, RawRow, AppError, ErrorType, ComparisonMode, VendorGroup } from './types';
 import { ERROR_TYPES } from './types';
-import { DebugPreview, ErrorDisplay, FileInputs, ResultsTable } from './components';
+import { DebugPreview, ErrorDisplay, FileInputs, ResultsTable, VendorAccordion } from './components';
 
 type Theme = 'light' | 'dark';
 
@@ -28,6 +28,8 @@ export default function App() {
   const [duplicateGroups, setDuplicateGroups] = useState<
     Array<{ key: string; items: AnyRecord[] }>
   >([]);
+  const [vendorGroups, setVendorGroups] = useState<VendorGroup[]>([]);
+  const [vendorsWithoutDuplicates, setVendorsWithoutDuplicates] = useState<string[]>([]);
 
   // Debug preview state
   const [csvColumnKeys, setCsvColumnKeys] = useState<string[]>([]);
@@ -42,6 +44,8 @@ export default function App() {
     setLoadingMessage('Starting...');
     setError(null);
     setDuplicateGroups([]);
+    setVendorGroups([]);
+    setVendorsWithoutDuplicates([]);
     setDroppedRowCount(0);
 
     try {
@@ -74,55 +78,53 @@ export default function App() {
           (billsRecords[0]?.raw as RawRow) ?? (buildiumRecords[0]?.raw as RawRow) ?? null,
         );
 
-        // Extract vendor from Buildium CSV and scope Bills CSV to it
-        setLoadingMessage('Analyzing vendor data...');
-        const buildiumRecordWithVendor = buildiumRecords.find(
-          (record) => record.vendorRaw && record.vendorRaw.trim(),
-        );
-        const scope = buildiumRecordWithVendor
-          ? { vendorRaw: buildiumRecordWithVendor.vendorRaw, vendorNorm: buildiumRecordWithVendor.vendorNorm }
-          : null;
-        setVendorScope(scope);
-
-        const scopedBillsRecords = scope
-          ? billsRecords.filter((record) => record.vendorNorm === scope.vendorNorm)
-          : billsRecords;
-
-        if (scope && scopedBillsRecords.length === 0) {
-          setError(
-            createAppError(
-              ERROR_TYPES.VENDOR_SCOPE_ERROR,
-              `No Bills CSV rows found for vendor "${scope.vendorRaw}"`,
-              "Verify that the vendor name in your 'Bills to Enter' CSV matches the vendor in the 'Buildium Export' CSV. Check for differences in capitalization, spacing, or special characters.",
-              `Looking for vendor: "${scope.vendorRaw}" (normalized: "${scope.vendorNorm}")`,
-            ),
-          );
-          return;
-        }
+        // No longer scoping to single vendor - process all vendors
+        setVendorScope(null);
 
         // Filter unusable rows
-        const usableBillsRecords = scopedBillsRecords.filter(
+        setLoadingMessage('Filtering data...');
+        const usableBillsRecords = billsRecords.filter(
           (r) => r.property !== '' && r.amountCents !== null,
         );
         const usableBuildiumRecords = buildiumRecords.filter(
           (r) => r.property !== '' && r.amountCents !== null,
         );
         setDroppedRowCount(
-          scopedBillsRecords.length +
+          billsRecords.length +
             buildiumRecords.length -
             (usableBillsRecords.length + usableBuildiumRecords.length),
         );
 
-        // Find duplicates between the two CSVs
+        // Find duplicates between the two CSVs (now includes vendor in matching key)
         setLoadingMessage('Finding duplicates...');
         const groupedDuplicates = buildGroupsCsvToCsv(usableBillsRecords, usableBuildiumRecords);
 
-        const uiGroups = groupedDuplicates.map((group) => ({
-          key: group.key,
-          items: [...group.csvRows, ...group.jsonRows] as AnyRecord[],
-        }));
-
-        setDuplicateGroups(uiGroups);
+        // Organize results by vendor
+        setLoadingMessage('Organizing by vendor...');
+        const vendorGroupsResult = groupByVendor(groupedDuplicates, usableBillsRecords, usableBuildiumRecords);
+        
+        // Identify vendors without duplicates
+        const allVendorsProcessed = new Set<string>();
+        for (const record of usableBillsRecords) {
+          if (record.vendorNorm) allVendorsProcessed.add(record.vendorNorm);
+        }
+        for (const record of usableBuildiumRecords) {
+          if (record.vendorNorm) allVendorsProcessed.add(record.vendorNorm);
+        }
+        
+        const vendorsWithDuplicatesSet = new Set(vendorGroupsResult.map(vg => vg.vendorNorm));
+        const vendorsWithoutDups: string[] = [];
+        for (const vendorNorm of allVendorsProcessed) {
+          if (!vendorsWithDuplicatesSet.has(vendorNorm)) {
+            const billRecord = usableBillsRecords.find(r => r.vendorNorm === vendorNorm);
+            const buildiumRecord = usableBuildiumRecords.find(r => r.vendorNorm === vendorNorm);
+            const vendorRaw = billRecord?.vendorRaw || buildiumRecord?.vendorRaw || vendorNorm;
+            vendorsWithoutDups.push(vendorRaw);
+          }
+        }
+        
+        setVendorGroups(vendorGroupsResult);
+        setVendorsWithoutDuplicates(vendorsWithoutDups);
       } else {
         // JSON+CSV comparison mode (legacy)
         setLoadingMessage('Parsing data files...');
@@ -308,7 +310,14 @@ export default function App() {
 
       <ErrorDisplay error={error} droppedCount={droppedRowCount} />
 
-      <ResultsTable groups={duplicateGroups} vendorScope={vendorScope} />
+      {comparisonMode === 'csv-csv' ? (
+        <VendorAccordion 
+          vendorGroups={vendorGroups} 
+          vendorsWithoutDuplicates={vendorsWithoutDuplicates}
+        />
+      ) : (
+        <ResultsTable groups={duplicateGroups} vendorScope={vendorScope} />
+      )}
     </div>
   );
 }
