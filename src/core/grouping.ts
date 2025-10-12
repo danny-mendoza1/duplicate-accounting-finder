@@ -37,8 +37,9 @@ export function groupByVendor(
   // Process duplicate groups
   for (const group of duplicateGroups) {
     // Get vendor from any record in the group (they should all match now due to key including vendor)
-    const vendorRaw = group.csvRows[0]?.vendorRaw || (group.jsonRows[0] as any)?.vendorRaw || '';
-    const vendorNorm = group.csvRows[0]?.vendorNorm || (group.jsonRows[0] as any)?.vendorNorm || '';
+    const firstRecord = group.csvRows[0] || group.jsonRows[0];
+    const vendorRaw = firstRecord?.vendorRaw || '';
+    const vendorNorm = firstRecord?.vendorNorm || '';
 
     if (!vendorMap.has(vendorNorm)) {
       vendorMap.set(vendorNorm, {
@@ -92,35 +93,64 @@ export function groupByVendor(
 }
 
 // New function for CSV+CSV comparison mode
-export function buildGroupsCsvToCsv(billsRecords: CsvRecord[], buildiumRecords: CsvRecord[]): UiGroup[] {
-  const buildiumMap = new Map<string, CsvRecord[]>();
+export function buildGroupsCsvToCsv(
+  billsRecords: CsvRecord[], 
+  buildiumRecords: CsvRecord[]
+): { validGroups: UiGroup[], invalidBills: CsvRecord[] } {
+  // Separate valid and invalid bills - never drop any bills
+  const validBills: CsvRecord[] = [];
+  const invalidBills: CsvRecord[] = [];
+  
+  for (const bill of billsRecords) {
+    if (bill.amountCents == null || !bill.property) {
+      invalidBills.push(bill);
+    } else {
+      validBills.push(bill);
+    }
+  }
+  
+  // Build index of valid buildium records (can skip invalid buildium records)
+  const buildiumIndex = new Map<string, CsvRecord[]>();
   for (const record of buildiumRecords) {
     if (record.amountCents == null || !record.property) continue;
     // Use absolute value for matching
-    const k = keyify({ property: record.property, amountCents: Math.abs(record.amountCents), vendorNorm: record.vendorNorm });
-    if (!buildiumMap.has(k)) buildiumMap.set(k, []);
-    buildiumMap.get(k)!.push(record);
+    const k = keyify({ 
+      property: record.property, 
+      amountCents: Math.abs(record.amountCents), 
+      vendorNorm: record.vendorNorm 
+    });
+    if (!buildiumIndex.has(k)) buildiumIndex.set(k, []);
+    buildiumIndex.get(k)!.push(record);
   }
 
+  // Find bills that match buildium records
   const groupsMap = new Map<string, UiGroup>();
-  for (const billRecord of billsRecords) {
-    if (billRecord.amountCents == null || !billRecord.property) continue;
-    // Use absolute value for matching
-    const k = keyify({ property: billRecord.property, amountCents: Math.abs(billRecord.amountCents), vendorNorm: billRecord.vendorNorm });
-    const buildiumBucket = buildiumMap.get(k);
-    if (!buildiumBucket) continue;
+  
+  for (const bill of validBills) {
+    const k = keyify({ 
+      property: bill.property, 
+      amountCents: Math.abs(bill.amountCents!), 
+      vendorNorm: bill.vendorNorm 
+    });
     
+    const buildiumMatches = buildiumIndex.get(k);
+    if (!buildiumMatches) continue; // No match, skip this bill
+    
+    // First time seeing this key - create group with buildium records
     if (!groupsMap.has(k)) {
-      groupsMap.set(k, { key: k, csvRows: [billRecord], jsonRows: [] });
+      groupsMap.set(k, { 
+        key: k, 
+        csvRows: [bill], 
+        jsonRows: buildiumMatches.map(b => b as unknown as JsonRecord)
+      });
     } else {
-      groupsMap.get(k)!.csvRows.push(billRecord);
-    }
-    
-    // Add buildium records as "jsonRows" for display compatibility
-    for (const buildiumRecord of buildiumBucket) {
-      groupsMap.get(k)!.jsonRows.push(buildiumRecord as unknown as JsonRecord);
+      // Additional bill with same key - just add the bill (buildium records already added)
+      groupsMap.get(k)!.csvRows.push(bill);
     }
   }
 
-  return [...groupsMap.values()];
+  return {
+    validGroups: Array.from(groupsMap.values()),
+    invalidBills
+  };
 }

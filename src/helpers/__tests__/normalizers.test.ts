@@ -79,16 +79,20 @@ describe('normalizeVendor', () => {
 });
 
 describe('keyify', () => {
-  it('should create consistent keys from property and amount', () => {
-    expect(keyify({ property: '123 main st', amountCents: 12345 })).toBe('123 main st|12345');
-    expect(keyify({ property: 'property name', amountCents: 10000 })).toBe('property name|10000');
+  it('should create consistent keys from vendor, property and amount', () => {
+    expect(keyify({ vendorNorm: 'acme corp', property: '123 main st', amountCents: 12345 })).toBe('acme corp|123 main st|12345');
+    expect(keyify({ vendorNorm: 'vendor inc', property: 'property name', amountCents: 10000 })).toBe('vendor inc|property name|10000');
   });
 
   it('should handle null amounts', () => {
-    expect(keyify({ property: '123 main st', amountCents: null })).toBe('123 main st|null');
+    expect(keyify({ vendorNorm: 'acme corp', property: '123 main st', amountCents: null })).toBe('acme corp|123 main st|null');
   });
 
   it('should handle empty properties', () => {
-    expect(keyify({ property: '', amountCents: 12345 })).toBe('|12345');
+    expect(keyify({ vendorNorm: 'acme corp', property: '', amountCents: 12345 })).toBe('acme corp||12345');
+  });
+
+  it('should handle empty vendor', () => {
+    expect(keyify({ vendorNorm: '', property: '123 main st', amountCents: 12345 })).toBe('|123 main st|12345');
   });
 });

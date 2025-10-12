@@ -3,9 +3,9 @@ import { parseJsonText, parseCsvText, createAppError } from './helpers';
 import { CSV_COLS, JSON_COLS } from './constants';
 import { BUILDIUM_CSV_COLUMNS } from './types';
 import { buildGroups, buildGroupsCsvToCsv, groupByVendor } from './core';
-import type { AnyRecord, RawRow, AppError, ErrorType, ComparisonMode, VendorGroup } from './types';
+import type { AnyRecord, RawRow, AppError, ErrorType, ComparisonMode, VendorGroup, CsvRecord } from './types';
 import { ERROR_TYPES } from './types';
-import { DebugPreview, ErrorDisplay, FileInputs, ResultsTable, VendorAccordion } from './components';
+import { DebugPreview, ErrorDisplay, FileInputs, InvalidBillsLog, ResultsTable, VendorAccordion } from './components';
 
 type Theme = 'light' | 'dark';
 
@@ -30,6 +30,7 @@ export default function App() {
   >([]);
   const [vendorGroups, setVendorGroups] = useState<VendorGroup[]>([]);
   const [vendorsWithoutDuplicates, setVendorsWithoutDuplicates] = useState<string[]>([]);
+  const [invalidBills, setInvalidBills] = useState<CsvRecord[]>([]);
 
   // Debug preview state
   const [csvColumnKeys, setCsvColumnKeys] = useState<string[]>([]);
@@ -46,6 +47,7 @@ export default function App() {
     setDuplicateGroups([]);
     setVendorGroups([]);
     setVendorsWithoutDuplicates([]);
+    setInvalidBills([]);
     setDroppedRowCount(0);
 
     try {
@@ -97,7 +99,13 @@ export default function App() {
 
         // Find duplicates between the two CSVs (now includes vendor in matching key)
         setLoadingMessage('Finding duplicates...');
-        const groupedDuplicates = buildGroupsCsvToCsv(usableBillsRecords, usableBuildiumRecords);
+        const { validGroups: groupedDuplicates, invalidBills: foundInvalidBills } = buildGroupsCsvToCsv(usableBillsRecords, usableBuildiumRecords);
+        
+        // Store invalid bills and log them
+        setInvalidBills(foundInvalidBills);
+        if (foundInvalidBills.length > 0) {
+          console.log('Invalid bills requiring attention:', foundInvalidBills);
+        }
 
         // Organize results by vendor
         setLoadingMessage('Organizing by vendor...');
@@ -318,6 +326,8 @@ export default function App() {
       ) : (
         <ResultsTable groups={duplicateGroups} vendorScope={vendorScope} />
       )}
+
+      <InvalidBillsLog invalidBills={invalidBills} />
     </div>
   );
 }

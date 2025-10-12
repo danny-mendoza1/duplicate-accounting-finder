@@ -1,7 +1,7 @@
 import type { AnyRecord } from '../types';
 import { CSV_COLS, JSON_COLS } from '../constants';
 import { BUILDIUM_CSV_COLUMNS } from '../types';
-import { formatUSDFromCents, getRaw, findHexInMemo } from '../helpers';
+import { formatUSDFromCents, getRaw, getMemoColor, extractMemoNumber } from '../helpers';
 
 interface ResultsTableProps {
   groups: Array<{ key: string; items: AnyRecord[] }>;
@@ -50,9 +50,10 @@ export default function ResultsTable({ groups, vendorScope = null, showHeader = 
               <col style={{ width: '8%' }} />
               <col style={{ width: '7%' }} />
               <col style={{ width: '12%' }} />
-              <col style={{ width: '20%' }} />
+              <col style={{ width: '19%' }} />
               <col style={{ width: '11%' }} />
-              <col style={{ width: '32%' }} />
+              <col style={{ width: '5%' }} />
+              <col style={{ width: '28%' }} />
               <col style={{ width: '10%' }} />
             </colgroup>
             <thead>
@@ -71,6 +72,9 @@ export default function ResultsTable({ groups, vendorScope = null, showHeader = 
                 </th>
                 <th style={{ textAlign: 'right', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Amount
+                </th>
+                <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
+                  Color
                 </th>
                 <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Memo
@@ -104,7 +108,8 @@ export default function ResultsTable({ groups, vendorScope = null, showHeader = 
                 
                 const dateVal = getRaw(record.raw, dateKey);
                 const memoVal = String(getRaw(record.raw, memoKey) ?? '');
-                const hex = findHexInMemo(memoVal);
+                const memoColorInfo = getMemoColor(memoVal);
+                const memoNumber = extractMemoNumber(memoVal);
 
                 // Determine display label and color
                 let sourceLabel = 'To Enter';
@@ -133,6 +138,16 @@ export default function ResultsTable({ groups, vendorScope = null, showHeader = 
                   typeColor = 'var(--color-other)';
                 }
 
+                // Create tooltip for color swatch
+                let colorTooltip = '';
+                if (memoColorInfo.source === 'hex') {
+                  colorTooltip = `Color from hex code: ${memoColorInfo.color}`;
+                } else if (memoColorInfo.source === 'number') {
+                  colorTooltip = `Color generated from memo #${memoNumber}`;
+                } else {
+                  colorTooltip = 'No memo number found';
+                }
+
                 return (
                   <tr
                     key={i}
@@ -157,24 +172,42 @@ export default function ResultsTable({ groups, vendorScope = null, showHeader = 
                     <td style={{ padding: 6, textAlign: 'right' }}>
                       {record.amountCents == null ? '' : formatUSDFromCents(Math.abs(record.amountCents))}
                     </td>
-                    <td style={{ padding: 6 }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                        {hex && (
-                          <span
-                            title={hex}
-                            style={{
-                              width: 14,
-                              height: 14,
-                              borderRadius: 3,
-                              backgroundColor: hex,
-                              border: '1px solid rgba(0,0,0,0.1)',
-                              boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)',
-                            }}
-                            aria-label={`Color indicator: ${hex}`}
-                          />
-                        )}
-                        <span>{memoVal}</span>
-                      </span>
+                    <td style={{ padding: '6px 12px 6px 6px', textAlign: 'center' }}>
+                      {memoColorInfo.source === 'default' ? (
+                        <span
+                          title={colorTooltip}
+                          style={{
+                            display: 'inline-block',
+                            width: 20,
+                            height: 20,
+                            fontSize: 16,
+                            lineHeight: '20px',
+                            textAlign: 'center',
+                            cursor: 'help',
+                          }}
+                          aria-label={colorTooltip}
+                        >
+                          ⚠️
+                        </span>
+                      ) : (
+                        <span
+                          title={colorTooltip}
+                          style={{
+                            display: 'inline-block',
+                            width: 20,
+                            height: 20,
+                            borderRadius: 3,
+                            backgroundColor: memoColorInfo.color,
+                            border: '1px solid rgba(0,0,0,0.2)',
+                            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.3)',
+                            cursor: 'help',
+                          }}
+                          aria-label={colorTooltip}
+                        />
+                      )}
+                    </td>
+                    <td style={{ padding: '6px 6px 6px 12px' }}>
+                      {memoVal}
                     </td>
                     <td style={{ padding: 6 }}>{record.vendorRaw}</td>
                   </tr>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { VendorGroup, AnyRecord } from '../types';
 import ResultsTable from './ResultsTable';
+import VendorsWithoutDuplicatesTable from './VendorsWithoutDuplicatesTable';
 
 interface VendorAccordionProps {
   vendorGroups: VendorGroup[];
@@ -101,23 +102,7 @@ export default function VendorAccordion({ vendorGroups, vendorsWithoutDuplicates
       })}
 
       {/* Vendors without duplicates */}
-      {vendorsWithoutDuplicates.length > 0 && (
-        <div
-          style={{
-            border: '1px solid var(--border-color)',
-            borderRadius: 8,
-            padding: 12,
-            backgroundColor: 'var(--bg-secondary)',
-          }}
-        >
-          <div style={{ fontSize: 14, marginBottom: 8 }}>
-            <strong>Vendors processed without duplicates ({vendorsWithoutDuplicates.length}):</strong>
-          </div>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-            {vendorsWithoutDuplicates.sort().join(', ')}
-          </div>
-        </div>
-      )}
+      <VendorsWithoutDuplicatesTable vendors={vendorsWithoutDuplicates} />
     </section>
   );
 }
