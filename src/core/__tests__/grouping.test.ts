@@ -35,7 +35,7 @@ describe('buildGroups', () => {
     expect(groups).toHaveLength(1);
     expect(groups[0].csvRows).toHaveLength(1);
     expect(groups[0].jsonRows).toHaveLength(1);
-    expect(groups[0].key).toBe('123 main st|10000');
+    expect(groups[0].key).toBe('acme corp|123 main st|10000');
   });
 
   it('should handle multiple matches for the same key', () => {
@@ -265,7 +265,7 @@ describe('buildGroups', () => {
     const groups = buildGroups(jsonRecords, csvRecords);
 
     expect(groups).toHaveLength(2);
-    expect(groups[0].key).toBe('123 main st|10000');
-    expect(groups[1].key).toBe('456 oak ave|20000');
+    expect(groups[0].key).toBe('acme corp|123 main st|10000');
+    expect(groups[1].key).toBe('acme corp|456 oak ave|20000');
   });
 });

@@ -41,6 +41,15 @@ export type UiGroup = {
   jsonRows: JsonRecord[];
 };
 
+export type VendorGroup = {
+  vendorRaw: string;
+  vendorNorm: string;
+  groups: UiGroup[];
+  billsCount: number;
+  buildiumCount: number;
+  duplicateGroupCount: number;
+};
+
 export type AnyRecord = CsvRecord | JsonRecord;
 
 export type ComparisonMode = 'json-csv' | 'csv-csv';

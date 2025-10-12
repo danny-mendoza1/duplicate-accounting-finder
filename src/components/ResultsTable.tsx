@@ -1,34 +1,41 @@
 import type { AnyRecord } from '../types';
 import { CSV_COLS, JSON_COLS } from '../constants';
 import { BUILDIUM_CSV_COLUMNS } from '../types';
-import { formatUSDFromCents, getRaw, findHexInMemo } from '../helpers';
+import { formatUSDFromCents, getRaw, getMemoColor, extractMemoNumber } from '../helpers';
 
 interface ResultsTableProps {
   groups: Array<{ key: string; items: AnyRecord[] }>;
-  vendorScope: { vendorRaw: string; vendorNorm: string } | null;
+  vendorScope?: { vendorRaw: string; vendorNorm: string } | null;
+  showHeader?: boolean;
 }
 
-export default function ResultsTable({ groups, vendorScope }: ResultsTableProps) {
+export default function ResultsTable({ groups, vendorScope = null, showHeader = true }: ResultsTableProps) {
   return (
     <section>
-      <h2 style={{ marginTop: 0 }}>Results for {vendorScope?.vendorRaw}</h2>
-      <div role="status" aria-live="polite" aria-atomic="true" style={{ marginBottom: 8 }}>
-        {groups.length === 0
-          ? 'No duplicates found (or nothing to process).'
-          : `${groups.length} duplicate group(s) found.`}
-      </div>
+      {showHeader && (
+        <>
+          <h2 style={{ marginTop: 0 }}>
+            {vendorScope ? `Results for ${vendorScope.vendorRaw}` : 'Results'}
+          </h2>
+          <div role="status" aria-live="polite" aria-atomic="true" style={{ marginBottom: 8 }}>
+            {groups.length === 0
+              ? 'No duplicates found (or nothing to process).'
+              : `${groups.length} duplicate group(s) found.`}
+          </div>
+        </>
+      )}
 
       {groups.map((group, idx) => (
         <div
           key={group.key}
           style={{
-            border: '1px solid #ddd',
+            border: '1px solid var(--border-color)',
             borderRadius: 8,
             padding: 8,
             marginBottom: 12,
           }}
         >
-          <div style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>
             Group {idx + 1} • key: <code>{group.key}</code> • count: {group.items.length}
           </div>
           <table
@@ -43,32 +50,36 @@ export default function ResultsTable({ groups, vendorScope }: ResultsTableProps)
               <col style={{ width: '8%' }} />
               <col style={{ width: '7%' }} />
               <col style={{ width: '12%' }} />
-              <col style={{ width: '20%' }} />
+              <col style={{ width: '19%' }} />
               <col style={{ width: '11%' }} />
-              <col style={{ width: '32%' }} />
+              <col style={{ width: '5%' }} />
+              <col style={{ width: '28%' }} />
               <col style={{ width: '10%' }} />
             </colgroup>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Src
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Type
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Date
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Property
                 </th>
-                <th style={{ textAlign: 'right', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'right', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Amount
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
+                  Color
+                </th>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Memo
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid #eee', padding: 6 }}>
+                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
                   Vendor
                 </th>
               </tr>
@@ -97,7 +108,8 @@ export default function ResultsTable({ groups, vendorScope }: ResultsTableProps)
                 
                 const dateVal = getRaw(record.raw, dateKey);
                 const memoVal = String(getRaw(record.raw, memoKey) ?? '');
-                const hex = findHexInMemo(memoVal);
+                const memoColorInfo = getMemoColor(memoVal);
+                const memoNumber = extractMemoNumber(memoVal);
 
                 // Determine display label and color
                 let sourceLabel = 'To Enter';
@@ -126,6 +138,16 @@ export default function ResultsTable({ groups, vendorScope }: ResultsTableProps)
                   typeColor = 'var(--color-other)';
                 }
 
+                // Create tooltip for color swatch
+                let colorTooltip = '';
+                if (memoColorInfo.source === 'hex') {
+                  colorTooltip = `Color from hex code: ${memoColorInfo.color}`;
+                } else if (memoColorInfo.source === 'number') {
+                  colorTooltip = `Color generated from memo #${memoNumber}`;
+                } else {
+                  colorTooltip = 'No memo number found';
+                }
+
                 return (
                   <tr
                     key={i}
@@ -150,24 +172,42 @@ export default function ResultsTable({ groups, vendorScope }: ResultsTableProps)
                     <td style={{ padding: 6, textAlign: 'right' }}>
                       {record.amountCents == null ? '' : formatUSDFromCents(Math.abs(record.amountCents))}
                     </td>
-                    <td style={{ padding: 6 }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                        {hex && (
-                          <span
-                            title={hex}
-                            style={{
-                              width: 14,
-                              height: 14,
-                              borderRadius: 3,
-                              backgroundColor: hex,
-                              border: '1px solid rgba(0,0,0,0.1)',
-                              boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)',
-                            }}
-                            aria-label={`Color indicator: ${hex}`}
-                          />
-                        )}
-                        <span>{memoVal}</span>
-                      </span>
+                    <td style={{ padding: '6px 12px 6px 6px', textAlign: 'center' }}>
+                      {memoColorInfo.source === 'default' ? (
+                        <span
+                          title={colorTooltip}
+                          style={{
+                            display: 'inline-block',
+                            width: 20,
+                            height: 20,
+                            fontSize: 16,
+                            lineHeight: '20px',
+                            textAlign: 'center',
+                            cursor: 'help',
+                          }}
+                          aria-label={colorTooltip}
+                        >
+                          ⚠️
+                        </span>
+                      ) : (
+                        <span
+                          title={colorTooltip}
+                          style={{
+                            display: 'inline-block',
+                            width: 20,
+                            height: 20,
+                            borderRadius: 3,
+                            backgroundColor: memoColorInfo.color,
+                            border: '1px solid rgba(0,0,0,0.2)',
+                            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.3)',
+                            cursor: 'help',
+                          }}
+                          aria-label={colorTooltip}
+                        />
+                      )}
+                    </td>
+                    <td style={{ padding: '6px 6px 6px 12px' }}>
+                      {memoVal}
                     </td>
                     <td style={{ padding: 6 }}>{record.vendorRaw}</td>
                   </tr>

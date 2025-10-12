@@ -39,6 +39,7 @@ export function normalizeVendor(value: string) {
 export function keyify({
   property,
   amountCents,
-}: Pick<CsvRecord, 'property' | 'amountCents'>): string {
-  return `${property}|${amountCents}`;
+  vendorNorm,
+}: Pick<CsvRecord, 'property' | 'amountCents' | 'vendorNorm'>): string {
+  return `${vendorNorm}|${property}|${amountCents}`;
 }
