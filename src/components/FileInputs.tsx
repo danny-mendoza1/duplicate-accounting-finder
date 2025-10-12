@@ -14,9 +14,9 @@ export function FileInputs({
   onRun,
 }: FileInputsProps) {
   return (
-    <section style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, marginBottom: 12 }}>
+    <section className="file-inputs-section">
       <label htmlFor="bills-csv-input">
-        <div style={{ fontSize: 12, marginBottom: 4, fontWeight: "bold" }}>
+        <div className="file-input-label-text">
           Upload CSV #1: Bills to Enter (Vendor Invoices)
         </div>
         <input
@@ -29,7 +29,7 @@ export function FileInputs({
       </label>
 
       <label htmlFor="buildium-csv-input">
-        <div style={{ fontSize: 12, marginBottom: 4, fontWeight: "bold" }}>
+        <div className="file-input-label-text">
           Upload CSV #2: Buildium Export
         </div>
         <input
@@ -47,22 +47,18 @@ export function FileInputs({
           disabled={isRunning}
           aria-busy={isRunning}
           title="Press Ctrl+Enter (Cmd+Enter on Mac) to run"
+          className="primary-button"
         >
           {isRunning ? "Running…" : "Find duplicates"}
         </button>
-        <span style={{ marginLeft: 8, fontSize: 12, color: "#666" }}>
+        <span className="button-hint">
           or press Ctrl+Enter
         </span>
         {isRunning && loadingMessage && (
           <div
             role="status"
             aria-live="polite"
-            style={{
-              marginTop: 8,
-              fontSize: 14,
-              color: "#555",
-              fontStyle: "italic"
-            }}
+            className="loading-message"
           >
             {loadingMessage}
           </div>

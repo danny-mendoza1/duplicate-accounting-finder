@@ -13,10 +13,10 @@ export function ResultsTable({ groups, vendorScope = null, showHeader = true }: 
     <section>
       {showHeader && (
         <>
-          <h2 style={{ marginTop: 0 }}>
+          <h2 className="results-title">
             {vendorScope ? `Results for ${vendorScope.vendorRaw}` : 'Results'}
           </h2>
-          <div role="status" aria-live="polite" aria-atomic="true" style={{ marginBottom: 8 }}>
+          <div role="status" aria-live="polite" aria-atomic="true" className="results-summary">
             {groups.length === 0
               ? 'No duplicates found (or nothing to process).'
               : `${groups.length} duplicate group(s) found.`}
@@ -27,24 +27,12 @@ export function ResultsTable({ groups, vendorScope = null, showHeader = true }: 
       {groups.map((group, idx) => (
         <div
           key={group.key}
-          style={{
-            border: '1px solid var(--border-color)',
-            borderRadius: 8,
-            padding: 8,
-            marginBottom: 12,
-          }}
+          className="duplicate-group-card"
         >
-          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>
+          <div className="duplicate-group-info">
             Group {idx + 1} • key: <code>{group.key}</code> • count: {group.items.length}
           </div>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontSize: 14,
-              tableLayout: 'fixed',
-            }}
-          >
+          <table className="duplicate-table">
             <colgroup>
               <col style={{ width: '8%' }} />
               <col style={{ width: '7%' }} />
@@ -57,28 +45,28 @@ export function ResultsTable({ groups, vendorScope = null, showHeader = true }: 
             </colgroup>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
+                <th>
                   Src
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
+                <th>
                   Type
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
+                <th>
                   Date
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
+                <th>
                   Property
                 </th>
-                <th style={{ textAlign: 'right', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
+                <th className="align-right">
                   Amount
                 </th>
-                <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
+                <th className="align-center">
                   Color
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
+                <th>
                   Memo
                 </th>
-                <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color-light)', padding: 6 }}>
+                <th>
                   Vendor
                 </th>
               </tr>
@@ -140,43 +128,35 @@ export function ResultsTable({ groups, vendorScope = null, showHeader = true }: 
                   colorTooltip = 'No memo number found';
                 }
 
+                const rowClass = isBills ? 'row-bills' : 'row-buildium';
+                const typeClass = isBill ? 'type-bill' : isEFT ? 'type-eft' : 'type-other';
+
                 return (
                   <tr
                     key={i}
-                    style={{
-                      backgroundColor,
-                    }}
+                    className={rowClass}
                   >
-                    <td style={{ padding: 6 }}>{sourceLabel}</td>
-                    <td style={{ padding: 6 }}>
-                      <span style={{ 
-                        color: typeColor, 
-                        fontWeight: 600,
-                        fontSize: 12
-                      }}>
+                    <td>{sourceLabel}</td>
+                    <td>
+                      <span 
+                        style={{ color: typeColor }}
+                        className="type-badge"
+                      >
                         {typeValue}
                       </span>
                     </td>
-                    <td style={{ padding: 6 }}>{dateVal}</td>
-                    <td style={{ padding: 6 }}>
+                    <td>{dateVal}</td>
+                    <td>
                       <code>{record.property}</code>
                     </td>
-                    <td style={{ padding: 6, textAlign: 'right' }}>
+                    <td className="align-right">
                       {record.amountCents == null ? '' : formatUSDFromCents(Math.abs(record.amountCents))}
                     </td>
-                    <td style={{ padding: '6px 12px 6px 6px', textAlign: 'center' }}>
+                    <td className="color-column">
                       {memoColorInfo.source === 'default' ? (
                         <span
                           title={colorTooltip}
-                          style={{
-                            display: 'inline-block',
-                            width: 20,
-                            height: 20,
-                            fontSize: 16,
-                            lineHeight: '20px',
-                            textAlign: 'center',
-                            cursor: 'help',
-                          }}
+                          className="color-swatch-warning"
                           aria-label={colorTooltip}
                         >
                           ⚠️
@@ -185,23 +165,17 @@ export function ResultsTable({ groups, vendorScope = null, showHeader = true }: 
                         <span
                           title={colorTooltip}
                           style={{
-                            display: 'inline-block',
-                            width: 20,
-                            height: 20,
-                            borderRadius: 3,
                             backgroundColor: memoColorInfo.color,
-                            border: '1px solid rgba(0,0,0,0.2)',
-                            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.3)',
-                            cursor: 'help',
                           }}
+                          className="color-swatch"
                           aria-label={colorTooltip}
                         />
                       )}
                     </td>
-                    <td style={{ padding: '6px 6px 6px 12px' }}>
+                    <td className="memo-column">
                       {memoVal}
                     </td>
-                    <td style={{ padding: 6 }}>{record.vendorRaw}</td>
+                    <td>{record.vendorRaw}</td>
                   </tr>
                 );
               })}

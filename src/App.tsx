@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useTheme, useFileProcessing, useDuplicateDetection } from './hooks';
 import { ErrorDisplay, FileInputs, InvalidBillsLog, VendorAccordion } from './components';
+import './App.css';
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
@@ -46,28 +47,19 @@ export default function App() {
   }, [handleRun, isRunning]);
 
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto', padding: 16 }}>
-      <header style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-          <div style={{ flex: 1 }}>
-            <h1 style={{ margin: 0 }}>Duplicate Accounting Finder</h1>
-            <p style={{ margin: '4px 0 0' }}>Upload both CSV files, then run detection to find duplicates.</p>
+    <div className="app-container">
+      <header className="app-header">
+        <div className="app-header-layout">
+          <div className="app-header-content">
+            <h1 className="app-title">Duplicate Accounting Finder</h1>
+            <p className="app-subtitle">Upload both CSV files, then run detection to find duplicates.</p>
           </div>
           
           {/* Theme toggle button */}
           <button
             onClick={toggleTheme}
             title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-            style={{
-              padding: '8px 12px',
-              fontSize: '18px',
-              background: 'transparent',
-              border: '1px solid var(--border-color)',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              flexShrink: 0,
-            }}
+            className="theme-toggle"
             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
