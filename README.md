@@ -106,18 +106,21 @@ All processing happens in-memory during the browser session. No data is persiste
 This is a portfolio project that evolved organically through iterative development. While maintaining quality standards, the approach prioritizes delivering working features and learning from real use.
 
 **Code Quality:**
+
 - TypeScript with `strict: true` - no `any` in core logic
 - ESLint + Prettier for consistent style
 - Unit tests for core business logic
 - Automated CI checks (typecheck, lint, tests) before deployment
 
 **Development Practices:**
+
 - Generally follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for clarity
 - [Architecture Decision Records](./docs/adr) for significant technical decisions
 - Feature branches merged via pull requests
 - GitHub Actions for CI/CD pipeline
 
 **Security & Privacy:**
+
 - Strong **Content Security Policy** - prevents XSS attacks
 - All data processing happens client-side - nothing leaves the device
 - In-memory only - no data persistence between sessions

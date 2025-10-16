@@ -50,5 +50,14 @@ export type DuplicateDetectionResult = {
   invalidBills: CsvRecord[];
 };
 
+// Sorting types
+export type SortColumn = 'type' | 'date';
+export type SortDirection = 'asc' | 'desc';
+
+export type SortConfig = {
+  column: SortColumn;
+  direction: SortDirection;
+};
+
 // Re-export from other type files
 export * from './errors';

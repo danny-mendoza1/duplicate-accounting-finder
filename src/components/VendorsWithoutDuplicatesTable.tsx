@@ -35,9 +35,7 @@ export function VendorsWithoutDuplicatesTable({ vendors }: VendorsWithoutDuplica
           <table className="vendors-table">
             <thead>
               <tr>
-                <th>
-                  Vendor Name
-                </th>
+                <th>Vendor Name</th>
               </tr>
             </thead>
             <tbody>

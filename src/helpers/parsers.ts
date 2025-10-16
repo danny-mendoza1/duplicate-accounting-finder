@@ -21,7 +21,11 @@ function validateColumns(row: Record<string, unknown>, columns: ColumnMap, sourc
   }
 }
 
-export function parseCsvText(csv: string, csvColumns: ColumnMap, source: RecordSource = 'bills'): CsvRecord[] {
+export function parseCsvText(
+  csv: string,
+  csvColumns: ColumnMap,
+  source: RecordSource = 'bills',
+): CsvRecord[] {
   try {
     const rows = parse(csv, {
       bom: true,
@@ -38,7 +42,7 @@ export function parseCsvText(csv: string, csvColumns: ColumnMap, source: RecordS
     return rows.map((row, index) => {
       const typeColumn = csvColumns.type;
       const typeRaw = typeColumn && typeColumn in row ? String(row[typeColumn]) : 'Bill';
-      
+
       return {
         src: source,
         i: index,

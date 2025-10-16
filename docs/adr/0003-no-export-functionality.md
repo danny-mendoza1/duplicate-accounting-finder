@@ -21,17 +21,20 @@ Chosen option: **No export (Option 1)**, because user feedback revealed that exp
 ## Consequences
 
 ### Good
+
 - **Simpler codebase**: No need to implement export logic, file generation, or download handling
 - **Focused purpose**: Application stays focused on its core function (detection and verification)
 - **Less maintenance**: Fewer features to test, debug, and maintain
 - **Faster iteration**: Can focus development effort on improving core detection logic
 
 ### Bad
+
 - **No permanent records**: Users cannot save comparison results
 - **Manual record-keeping**: If users need records, they must screenshot or manually note findings
 - **Cannot share results**: No easy way to share findings with colleagues
 
 ### Mitigations
+
 - The "bad" consequences don't actually impact users because:
   - Users take action directly in their accounting system based on what they see
   - The comparison is a decision-making tool, not a reporting tool
@@ -42,6 +45,7 @@ Chosen option: **No export (Option 1)**, because user feedback revealed that exp
 Export functionality was initially included in the MVP scope based on an assumption that users would want permanent records of duplicate detection results.
 
 **User feedback revealed:**
+
 1. Users review duplicates in the application interface
 2. They take immediate action in their accounting system
 3. They don't need or want permanent records of comparisons
@@ -52,6 +56,7 @@ This is a perfect example of **validating assumptions before building**. What se
 ## User Workflow
 
 The actual workflow is:
+
 1. Upload two CSV files
 2. Review duplicates and vendor records in the application
 3. Navigate to accounting system

@@ -16,9 +16,7 @@ export function FileInputs({
   return (
     <section className="file-inputs-section">
       <label htmlFor="bills-csv-input">
-        <div className="file-input-label-text">
-          Upload CSV #1: Bills to Enter (Vendor Invoices)
-        </div>
+        <div className="file-input-label-text">Upload CSV #1: Bills to Enter (Vendor Invoices)</div>
         <input
           id="bills-csv-input"
           type="file"
@@ -29,9 +27,7 @@ export function FileInputs({
       </label>
 
       <label htmlFor="buildium-csv-input">
-        <div className="file-input-label-text">
-          Upload CSV #2: Buildium Export
-        </div>
+        <div className="file-input-label-text">Upload CSV #2: Buildium Export</div>
         <input
           id="buildium-csv-input"
           type="file"
@@ -49,17 +45,11 @@ export function FileInputs({
           title="Press Ctrl+Enter (Cmd+Enter on Mac) to run"
           className="primary-button"
         >
-          {isRunning ? "Running…" : "Find duplicates"}
+          {isRunning ? 'Running…' : 'Find duplicates'}
         </button>
-        <span className="button-hint">
-          or press Ctrl+Enter
-        </span>
+        <span className="button-hint">or press Ctrl+Enter</span>
         {isRunning && loadingMessage && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="loading-message"
-          >
+          <div role="status" aria-live="polite" className="loading-message">
             {loadingMessage}
           </div>
         )}

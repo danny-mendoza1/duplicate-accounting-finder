@@ -70,13 +70,17 @@ describe('FileInputs', () => {
     });
 
     it('should display loading message when running', () => {
-      render(<FileInputs {...defaultProps} isRunning={true} loadingMessage="Processing files..." />);
+      render(
+        <FileInputs {...defaultProps} isRunning={true} loadingMessage="Processing files..." />,
+      );
 
       expect(screen.getByText('Processing files...')).toBeInTheDocument();
     });
 
     it('should not display loading message when not running', () => {
-      render(<FileInputs {...defaultProps} isRunning={false} loadingMessage="Processing files..." />);
+      render(
+        <FileInputs {...defaultProps} isRunning={false} loadingMessage="Processing files..." />,
+      );
 
       expect(screen.queryByText('Processing files...')).not.toBeInTheDocument();
     });

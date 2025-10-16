@@ -15,7 +15,7 @@ export default function App() {
     error,
     parseFiles,
   } = useFileProcessing();
-  
+
   const {
     vendorGroups,
     vendorsWithoutDuplicates,
@@ -26,10 +26,10 @@ export default function App() {
 
   const handleRun = useCallback(async () => {
     resetDuplicates();
-    
+
     const result = await parseFiles(csvFile, buildiumCsvFile);
     if (!result) return;
-    
+
     findDuplicates(result.billsRecords, result.buildiumRecords);
   }, [csvFile, buildiumCsvFile, parseFiles, findDuplicates, resetDuplicates]);
 
@@ -51,9 +51,11 @@ export default function App() {
         <div className="app-header-layout">
           <div className="app-header-content">
             <h1 className="app-title">Duplicate Accounting Finder</h1>
-            <p className="app-subtitle">Upload both CSV files, then run detection to find duplicates.</p>
+            <p className="app-subtitle">
+              Upload both CSV files, then run detection to find duplicates.
+            </p>
           </div>
-          
+
           <button
             onClick={toggleTheme}
             title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
@@ -75,8 +77,8 @@ export default function App() {
 
       <ErrorDisplay error={error} />
 
-      <VendorAccordion 
-        vendorGroups={vendorGroups} 
+      <VendorAccordion
+        vendorGroups={vendorGroups}
         vendorsWithoutDuplicates={vendorsWithoutDuplicates}
       />
 
