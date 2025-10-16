@@ -14,12 +14,10 @@ export function InvalidBillsLog({ invalidBills }: InvalidBillsLogProps) {
       </summary>
       <div className="invalid-bills-content">
         <p className="invalid-bills-description">
-          These bills are missing required data (property, amount, or vendor) and cannot be processed.
-          Open the browser console (F12) to view the full details.
+          These bills are missing required data (property, amount, or vendor) and cannot be
+          processed. Open the browser console (F12) to view the full details.
         </p>
-        <pre className="invalid-bills-pre">
-          {JSON.stringify(invalidBills, null, 2)}
-        </pre>
+        <pre className="invalid-bills-pre">{JSON.stringify(invalidBills, null, 2)}</pre>
       </div>
     </details>
   );

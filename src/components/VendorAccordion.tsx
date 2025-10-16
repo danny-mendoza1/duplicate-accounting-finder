@@ -8,24 +8,28 @@ interface VendorAccordionProps {
   vendorsWithoutDuplicates?: string[];
 }
 
-export function VendorAccordion({ vendorGroups, vendorsWithoutDuplicates = [] }: VendorAccordionProps) {
+export function VendorAccordion({
+  vendorGroups,
+  vendorsWithoutDuplicates = [],
+}: VendorAccordionProps) {
   const [expandedVendors, setExpandedVendors] = useState<Set<string>>(new Set());
 
   const totalDuplicateGroups = useMemo(
     () => vendorGroups.reduce((sum, v) => sum + v.duplicateGroupCount, 0),
-    [vendorGroups]
+    [vendorGroups],
   );
 
   // Memoize the transformed vendor groups to avoid recreating on every render
   const transformedVendorGroups = useMemo(
-    () => vendorGroups.map((vendorGroup) => ({
-      ...vendorGroup,
-      transformedGroups: vendorGroup.groups.map((group) => ({
-        key: group.key,
-        items: [...group.billsRows, ...group.buildiumRows],
+    () =>
+      vendorGroups.map((vendorGroup) => ({
+        ...vendorGroup,
+        transformedGroups: vendorGroup.groups.map((group) => ({
+          key: group.key,
+          items: [...group.billsRows, ...group.buildiumRows],
+        })),
       })),
-    })),
-    [vendorGroups]
+    [vendorGroups],
   );
 
   const toggleVendor = (vendorNorm: string) => {
@@ -61,10 +65,7 @@ export function VendorAccordion({ vendorGroups, vendorsWithoutDuplicates = [] }:
         const isExpanded = expandedVendors.has(vendorGroup.vendorNorm);
 
         return (
-          <div
-            key={vendorGroup.vendorNorm}
-            className="vendor-card"
-          >
+          <div key={vendorGroup.vendorNorm} className="vendor-card">
             {/* Vendor Header - Clickable */}
             <button
               onClick={() => toggleVendor(vendorGroup.vendorNorm)}
@@ -74,11 +75,13 @@ export function VendorAccordion({ vendorGroups, vendorsWithoutDuplicates = [] }:
               <div>
                 <strong className="vendor-name">{vendorGroup.vendorRaw}</strong>
                 <div className="vendor-stats">
-                  {vendorGroup.duplicateGroupCount} duplicate group(s) • {vendorGroup.billsCount} bills •{' '}
-                  {vendorGroup.buildiumCount} buildium records
+                  {vendorGroup.duplicateGroupCount} duplicate group(s) • {vendorGroup.billsCount}{' '}
+                  bills • {vendorGroup.buildiumCount} buildium records
                 </div>
               </div>
-              <span className={`vendor-expand-icon ${isExpanded ? 'vendor-expand-icon--expanded' : ''}`}>
+              <span
+                className={`vendor-expand-icon ${isExpanded ? 'vendor-expand-icon--expanded' : ''}`}
+              >
                 ▼
               </span>
             </button>
@@ -86,10 +89,7 @@ export function VendorAccordion({ vendorGroups, vendorsWithoutDuplicates = [] }:
             {/* Vendor Details - Expandable */}
             {isExpanded && (
               <div className="vendor-card-body">
-                <ResultsTable
-                  groups={vendorGroup.transformedGroups}
-                  showHeader={false}
-                />
+                <ResultsTable groups={vendorGroup.transformedGroups} showHeader={false} />
               </div>
             )}
           </div>

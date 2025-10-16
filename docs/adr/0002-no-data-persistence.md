@@ -21,17 +21,20 @@ Chosen option: **In-memory only (Option 1)**, because it matches the actual use 
 ## Consequences
 
 ### Good
+
 - **Simplest security model**: Data automatically cleared when page closes - no need for "Clear data" buttons or encryption key management
 - **Matches actual workflow**: Users perform one-time comparisons, review results, then take action in their accounting system
 - **No encryption complexity**: No need to implement or maintain Web Crypto encryption
 - **Transparent to users**: Clear mental model - close the tab, data is gone
 
 ### Bad
+
 - **No result history**: Users cannot review previous comparisons
 - **Must re-upload for repeated comparisons**: If users close the tab, they must start over
 - **No cross-session convenience**: Cannot save state between visits
 
 ### Mitigations
+
 - The "bad" consequences don't actually matter for this use case:
   - Users don't need comparison history
   - Re-uploading two CSV files is fast (< 5 seconds)

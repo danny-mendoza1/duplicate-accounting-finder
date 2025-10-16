@@ -9,8 +9,11 @@ export function useDuplicateDetection() {
 
   const findDuplicates = useCallback((billsRecords: CsvRecord[], buildiumRecords: CsvRecord[]) => {
     // Find duplicates between the two CSVs
-    const { validGroups: duplicateGroups, invalidBills: foundInvalidBills } = buildGroupsCsvToCsv(billsRecords, buildiumRecords);
-    
+    const { validGroups: duplicateGroups, invalidBills: foundInvalidBills } = buildGroupsCsvToCsv(
+      billsRecords,
+      buildiumRecords,
+    );
+
     // Store invalid bills and log them
     setInvalidBills(foundInvalidBills);
     if (foundInvalidBills.length > 0) {
@@ -18,9 +21,12 @@ export function useDuplicateDetection() {
     }
 
     // Organize results by vendor - returns vendors with and without duplicates
-    const { vendorsWithDuplicates, vendorsWithoutDuplicates } = 
-      groupByVendor(duplicateGroups, billsRecords, buildiumRecords);
-    
+    const { vendorsWithDuplicates, vendorsWithoutDuplicates } = groupByVendor(
+      duplicateGroups,
+      billsRecords,
+      buildiumRecords,
+    );
+
     setVendorGroups(vendorsWithDuplicates);
     setVendorsWithoutDuplicates(vendorsWithoutDuplicates);
   }, []);

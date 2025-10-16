@@ -2,13 +2,13 @@ import type { CsvRecord, UiGroup, VendorGroup, DuplicateDetectionResult } from '
 import { keyify } from '../helpers';
 
 export function buildGroupsCsvToCsv(
-  billsRecords: CsvRecord[], 
-  buildiumRecords: CsvRecord[]
+  billsRecords: CsvRecord[],
+  buildiumRecords: CsvRecord[],
 ): DuplicateDetectionResult {
   // Separate valid and invalid bills - never drop any bills
   const validBills: CsvRecord[] = [];
   const invalidBills: CsvRecord[] = [];
-  
+
   for (const bill of billsRecords) {
     if (bill.amountCents == null || !bill.property) {
       invalidBills.push(bill);
@@ -16,16 +16,16 @@ export function buildGroupsCsvToCsv(
       validBills.push(bill);
     }
   }
-  
+
   // Build index of valid buildium records (can skip invalid buildium records)
   const buildiumIndex = new Map<string, CsvRecord[]>();
   for (const record of buildiumRecords) {
     if (record.amountCents == null || !record.property) continue;
     // Use absolute value for matching
-    const k = keyify({ 
-      property: record.property, 
-      amountCents: Math.abs(record.amountCents), 
-      vendorNorm: record.vendorNorm 
+    const k = keyify({
+      property: record.property,
+      amountCents: Math.abs(record.amountCents),
+      vendorNorm: record.vendorNorm,
     });
     if (!buildiumIndex.has(k)) buildiumIndex.set(k, []);
     buildiumIndex.get(k)!.push(record);
@@ -33,24 +33,24 @@ export function buildGroupsCsvToCsv(
 
   // Find bills that match buildium records
   const groupsMap = new Map<string, UiGroup>();
-  
+
   for (const bill of validBills) {
     // Non-null assertion is safe: validBills were filtered to exclude null amountCents
-    const k = keyify({ 
-      property: bill.property, 
-      amountCents: Math.abs(bill.amountCents!), 
-      vendorNorm: bill.vendorNorm 
+    const k = keyify({
+      property: bill.property,
+      amountCents: Math.abs(bill.amountCents!),
+      vendorNorm: bill.vendorNorm,
     });
-    
+
     const buildiumMatches = buildiumIndex.get(k);
     if (!buildiumMatches) continue; // No match, skip this bill
-    
+
     // First time seeing this key - create group with buildium records
     if (!groupsMap.has(k)) {
-      groupsMap.set(k, { 
-        key: k, 
-        billsRows: [bill], 
-        buildiumRows: buildiumMatches
+      groupsMap.set(k, {
+        key: k,
+        billsRows: [bill],
+        buildiumRows: buildiumMatches,
       });
     } else {
       // Additional bill with same key - just add the bill (buildium records already added)
@@ -60,7 +60,7 @@ export function buildGroupsCsvToCsv(
 
   return {
     validGroups: Array.from(groupsMap.values()),
-    invalidBills
+    invalidBills,
   };
 }
 
@@ -68,7 +68,7 @@ export function buildGroupsCsvToCsv(
 export function groupByVendor(
   duplicateGroups: UiGroup[],
   allBillsRecords: CsvRecord[],
-  allBuildiumRecords: CsvRecord[]
+  allBuildiumRecords: CsvRecord[],
 ): {
   vendorsWithDuplicates: VendorGroup[];
   vendorsWithoutDuplicates: string[];
@@ -103,13 +103,13 @@ export function groupByVendor(
 
   // Identify all vendors that were processed but had no duplicates
   const allVendorsProcessed = new Set<string>();
-  
+
   for (const record of allBillsRecords) {
     if (record.vendorNorm) {
       allVendorsProcessed.add(record.vendorNorm);
     }
   }
-  
+
   for (const record of allBuildiumRecords) {
     if (record.vendorNorm) {
       allVendorsProcessed.add(record.vendorNorm);
@@ -124,8 +124,8 @@ export function groupByVendor(
   for (const vendorNorm of allVendorsProcessed) {
     if (!vendorMap.has(vendorNorm)) {
       // Find the raw vendor name
-      const billRecord = allBillsRecords.find(r => r.vendorNorm === vendorNorm);
-      const buildiumRecord = allBuildiumRecords.find(r => r.vendorNorm === vendorNorm);
+      const billRecord = allBillsRecords.find((r) => r.vendorNorm === vendorNorm);
+      const buildiumRecord = allBuildiumRecords.find((r) => r.vendorNorm === vendorNorm);
       const vendorRaw = billRecord?.vendorRaw || buildiumRecord?.vendorRaw || vendorNorm;
       vendorsWithoutDuplicates.push(vendorRaw);
     }

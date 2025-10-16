@@ -23,13 +23,15 @@ Chosen option: **Strict CSP via meta tag (Option 2)**, because it provides defen
 Added CSP via meta tag in `index.html`:
 
 ```html
-<meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self'; 
+<meta
+  http-equiv="Content-Security-Policy"
+  content="default-src 'self'; 
                script-src 'self'; 
                style-src 'self' 'unsafe-inline'; 
                img-src 'self' data:; 
                font-src 'self'; 
-               connect-src 'self'">
+               connect-src 'self'"
+/>
 ```
 
 ### Policy Breakdown
@@ -44,6 +46,7 @@ Added CSP via meta tag in `index.html`:
 ## Consequences
 
 ### Good
+
 - **XSS protection**: Even if an XSS vulnerability exists, injected scripts cannot load from external sources
 - **No external dependencies**: Policy enforces our "no third-party scripts" security goal
 - **Defense in depth**: Adds security layer beyond code-level protections
@@ -51,11 +54,13 @@ Added CSP via meta tag in `index.html`:
 - **Simple implementation**: Single meta tag, no build configuration needed
 
 ### Bad
+
 - **`'unsafe-inline'` for styles**: Had to allow inline styles for React/Vite to work properly
 - **Debugging complexity**: CSP violations show in console, may confuse during development
 - **Build tool constraints**: Must ensure Vite doesn't inject external scripts
 
 ### Trade-offs Accepted
+
 - **`'unsafe-inline'` for styles** is necessary for modern React development and doesn't meaningfully reduce XSS protection (most XSS is JavaScript, not CSS)
 - Could tighten to use nonces/hashes in future, but current policy is sufficient for v1
 
@@ -73,6 +78,7 @@ The CSP meta tag approach is simpler than HTTP headers for static hosting on Git
 ## Testing
 
 Verified CSP implementation:
+
 - Check browser console for CSP violations
 - Confirm no external resources are loaded
 - Test that application functions correctly with CSP enabled
