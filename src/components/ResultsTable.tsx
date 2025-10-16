@@ -94,13 +94,11 @@ export function ResultsTable({ groups, vendorScope = null, showHeader = true }: 
                 const memoColorInfo = getMemoColor(memoVal);
                 const memoNumber = extractMemoNumber(memoVal);
 
-                // Determine display label and color
+                // Determine display label
                 let sourceLabel = 'To Enter';
-                let backgroundColor = 'var(--bg-row-bills)';
                 
                 if (isBuildium) {
                   sourceLabel = 'Buildium Export';
-                  backgroundColor = 'var(--bg-row-buildium)';
                 }
 
                 // Determine type label and styling
@@ -129,7 +127,6 @@ export function ResultsTable({ groups, vendorScope = null, showHeader = true }: 
                 }
 
                 const rowClass = isBills ? 'row-bills' : 'row-buildium';
-                const typeClass = isBill ? 'type-bill' : isEFT ? 'type-eft' : 'type-other';
 
                 return (
                   <tr
