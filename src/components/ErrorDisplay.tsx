@@ -10,23 +10,16 @@ export function ErrorDisplay({ error }: ErrorDisplayProps) {
       <div
         role="alert"
         aria-live="polite"
-        style={{
-          padding: 12,
-          backgroundColor: '#fee',
-          border: '1px solid #c33',
-          borderRadius: 4,
-          color: '#811',
-          marginBottom: 12,
-        }}
+        className="error-display"
       >
-        <div style={{ fontWeight: 600, marginBottom: 4 }}>{error.message}</div>
+        <div className="error-display-title">{error.message}</div>
         {error.suggestion && (
-          <div style={{ fontSize: 14, marginTop: 8 }}>
+          <div className="error-display-suggestion">
             <strong>Suggestion:</strong> {error.suggestion}
           </div>
         )}
         {error.details && (
-          <div style={{ fontSize: 12, marginTop: 4, opacity: 0.8 }}>{error.details}</div>
+          <div className="error-display-details">{error.details}</div>
         )}
       </div>
     );
