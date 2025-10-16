@@ -33,7 +33,6 @@ export default function App() {
     findDuplicates(result.billsRecords, result.buildiumRecords);
   }, [csvFile, buildiumCsvFile, parseFiles, findDuplicates, resetDuplicates]);
 
-  // Keyboard shortcut: Ctrl/Cmd + Enter to run
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !isRunning) {
@@ -55,7 +54,6 @@ export default function App() {
             <p className="app-subtitle">Upload both CSV files, then run detection to find duplicates.</p>
           </div>
           
-          {/* Theme toggle button */}
           <button
             onClick={toggleTheme}
             title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
