@@ -1,115 +1,204 @@
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  /* Spacing Scale (4px-based) */
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 1rem;       /* 16px */
+  --space-lg: 1.5rem;     /* 24px */
+  --space-xl: 2rem;       /* 32px */
+  --space-2xl: 3rem;      /* 48px */
+  --space-3xl: 4rem;      /* 64px */
+
+  /* Border Radius */
+  --radius-sm: 0.5rem;    /* 8px */
+  --radius-md: 0.75rem;   /* 12px */
+  --radius-lg: 1rem;      /* 16px */
+
+  /* Transitions */
+  --transition-base: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+
+  --accent-purple: hsl(262 83% 65%);
+  --accent-purple-hover: hsl(262 83% 70%);
+  --accent-purple-muted: hsl(262 83% 65% / 0.1);
+  --accent-purple-bright: hsl(262 83% 75%);
+
+  --accent-teal: hsl(174 72% 50%);
+  --accent-teal-muted: hsl(174 72% 50% / 0.1);
+
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Dark theme (default) */
+
 [data-theme='dark'] {
   color-scheme: dark;
-  --bg-primary: #242424;
-  --bg-secondary: #1a1a1a;
-  --bg-surface: #2d2d2d;
-  --text-primary: rgba(255, 255, 255, 0.87);
-  --text-secondary: rgba(255, 255, 255, 0.6);
-  --border-color: #404040;
-  --border-color-light: #555;
-  --accent-color: #646cff;
-  --accent-hover: #535bf2;
 
-  /* Type colors for Bill vs EFT vs Other */
-  --color-bill: #39ff14;
-  --color-eft: #00e5ff;
-  --color-other: #ff6b6b;
+  --bg-primary: hsl(222 47% 6%);      /* #020617 - Very dark blue */
+  --bg-secondary: hsl(222 47% 8%);    /* #0f172a - Dark blue-gray (cards) */
+  --bg-tertiary: hsl(222 30% 12%);    /* Muted backgrounds */
+  --bg-hover: hsl(222 30% 14%);       /* Hover state */
+
+  --text-primary: hsl(210 40% 98%);   /* Near white */
+  --text-secondary: hsl(215 20% 70%); /* Muted text */
+  --text-tertiary: hsl(215 20% 55%);  /* Disabled/subtle text */
+
+  --border-primary: hsl(222 30% 16%);
+  --border-subtle: hsl(222 30% 12%);
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-glow: 0 0 40px hsl(262 83% 65% / 0.15);
+
+  --color-bill: hsl(142 76% 59%);     /* Green  */
+  --color-eft: hsl(189 100% 60%);     /* Cyan */
+  --color-other: hsl(0 84% 65%);      /* Red */
 
   /* Row backgrounds */
-  --bg-row-bills: rgba(255, 255, 255, 0.04);
-  --bg-row-buildium: rgba(56, 132, 255, 0.12);
+  --bg-row-bills: hsl(222 30% 10%);
+  --bg-row-buildium: hsl(222 47% 10% / 0.8);
 
-  /* Comparison mode toggle */
-  --toggle-bg: #2d2d2d;
-  --toggle-border: #404040;
-  --toggle-selected-bg: rgba(100, 108, 255, 0.2);
-  --toggle-selected-border: #646cff;
-  --toggle-selected-text: #646cff;
+  /* Focus */
+  --color-focus: var(--accent-purple);
 
+  /* Apply colors */
   color: var(--text-primary);
   background-color: var(--bg-primary);
 }
 
-/* Light theme */
 [data-theme='light'] {
   color-scheme: light;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9f9f9;
-  --bg-surface: #ffffff;
-  --text-primary: #213547;
-  --text-secondary: #666;
-  --border-color: #ddd;
-  --border-color-light: #e5e5e5;
-  --accent-color: #0066cc;
-  --accent-hover: #0052a3;
 
-  /* Type colors for Bill vs EFT vs Other */
-  --color-bill: #00751a;
-  --color-eft: #0047ff;
-  --color-other: #d32f2f;
+  /* Backgrounds */
+  --bg-primary: hsl(0 0% 100%);       /* Pure white */
+  --bg-secondary: hsl(220 13% 97%);   /* Light gray for cards */
+  --bg-tertiary: hsl(220 13% 95%);    /* Muted sections */
+  --bg-hover: hsl(220 13% 93%);       /* Hover state */
+
+  /* Text */
+  --text-primary: hsl(222 47% 11%);   /* Dark blue (inverted bg) */
+  --text-secondary: hsl(215 20% 40%); /* Gray text */
+  --text-tertiary: hsl(215 20% 55%);  /* Disabled/subtle text */
+
+  /* Borders */
+  --border-primary: hsl(220 13% 91%);
+  --border-subtle: hsl(220 13% 95%);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-glow: 0 0 40px hsl(262 83% 65% / 0.15);
+
+  /* Type colors for Bills vs EFT vs Other (darker for light bg) */
+  --color-bill: hsl(142 70% 35%);     /* Dark green */
+  --color-eft: hsl(189 95% 40%);      /* Dark cyan */
+  --color-other: hsl(0 84% 50%);      /* Dark red */
 
   /* Row backgrounds */
-  --bg-row-bills: rgba(0, 0, 0, 0.02);
-  --bg-row-buildium: rgba(0, 71, 255, 0.08);
+  --bg-row-bills: hsl(220 13% 98%);
+  --bg-row-buildium: hsl(220 13% 96%);
 
-  /* Comparison mode toggle */
-  --toggle-bg: #ffffff;
-  --toggle-border: #ddd;
-  --toggle-selected-bg: #e6f2ff;
-  --toggle-selected-border: #0066cc;
-  --toggle-selected-text: #0066cc;
+  /* Focus */
+  --color-focus: var(--accent-purple);
 
+  /* Apply colors */
   color: var(--text-primary);
   background-color: var(--bg-primary);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 2.5rem;
+  font-weight: 800;
   line-height: 1.1;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+h2 {
+  font-size: 1.875rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+code, pre {
+  font-family: var(--font-mono);
+}
+
+/* Links */
+a {
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+  color: var(--accent-purple);
+  text-decoration: none;
+  transition: color var(--transition-base);
 }
-button:hover {
-  border-color: #646cff;
+
+a:hover {
+  color: var(--accent-purple-hover);
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+.fade-in {
+  animation: fadeIn var(--transition-slow);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
