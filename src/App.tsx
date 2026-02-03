@@ -46,43 +46,43 @@ export default function App() {
   }, [handleRun, isRunning]);
 
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <div className="app-header-layout">
-          <div className="app-header-content">
+    <>
+      <button
+        onClick={toggleTheme}
+        title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        className="theme-toggle"
+        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      >
+        {theme === 'dark' ? '☀️' : '🌙'}
+      </button>
+
+      <div className="app-container">
+        <div className="content-wrapper">
+          <header className="app-header">
             <h1 className="app-title">Duplicate Accounting Finder</h1>
             <p className="app-subtitle">
               Upload both CSV files, then run detection to find duplicates.
             </p>
-          </div>
+          </header>
 
-          <button
-            onClick={toggleTheme}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-            className="theme-toggle"
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          >
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </button>
+          <FileInputs
+            onCsvFileChange={setCsvFile}
+            onBuildiumCsvFileChange={setBuildiumCsvFile}
+            isRunning={isRunning}
+            loadingMessage={loadingMessage}
+            onRun={handleRun}
+          />
+
+          <ErrorDisplay error={error} />
+
+          <VendorAccordion
+            vendorGroups={vendorGroups}
+            vendorsWithoutDuplicates={vendorsWithoutDuplicates}
+          />
+
+          <InvalidBillsLog invalidBills={invalidBills} />
         </div>
-      </header>
-
-      <FileInputs
-        onCsvFileChange={setCsvFile}
-        onBuildiumCsvFileChange={setBuildiumCsvFile}
-        isRunning={isRunning}
-        loadingMessage={loadingMessage}
-        onRun={handleRun}
-      />
-
-      <ErrorDisplay error={error} />
-
-      <VendorAccordion
-        vendorGroups={vendorGroups}
-        vendorsWithoutDuplicates={vendorsWithoutDuplicates}
-      />
-
-      <InvalidBillsLog invalidBills={invalidBills} />
-    </div>
+      </div>
+    </>
   );
 }

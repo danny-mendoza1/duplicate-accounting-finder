@@ -95,6 +95,50 @@ This project evolved organically based on real user needs and constraints. Rathe
 
 ---
 
+### Phase 5: Portfolio-Quality Design & UX Refinement
+
+**Context:** After several months of reliable use in production, users requested design improvements for better presentation and readability. The application's core functionality had proven robust through regular real-world use, making this an ideal time to focus on visual polish and user experience refinement.
+
+**Implementation:** Comprehensive design overhaul and enhanced file upload experience
+
+**Design System:**
+
+- Modern purple accent color (`hsl(262 83% 65%)`) matching portfolio brand identity
+- Glass morphism effects with semi-transparent cards and backdrop blur
+- Professional typography: Inter (UI) and JetBrains Mono (code/data) via Google Fonts
+- Smooth transitions, animations, and hover states throughout
+- Dark mode optimized with proper contrast ratios (WCAG AA)
+
+**Enhanced File Upload Experience:**
+
+- Fixed bug where clicking anywhere in upload card opened file dialog
+- Vertical layout with clear visual hierarchy (labels above inputs)
+- Real-time visual feedback: checkmarks appear when files are uploaded
+- Smart filename truncation for long names with hover tooltips for full text
+- Remove buttons (×) to easily clear file selections
+- Fully responsive design supporting mobile devices (iPhone SE 375px+)
+
+**Technical Improvements:**
+
+- Responsive tables with horizontal scroll and visual scroll indicators
+- Updated Content Security Policy to allow Google Fonts CDN (HTTPS-only)
+- Enhanced accessibility (proper ARIA labels, keyboard navigation, focus states)
+- Mobile-optimized spacing, typography, and touch targets
+
+**Rationale:** The project's goal has always been **working, reliable software**. After months of production use confirming the core functionality is solid, investing in professional design demonstrates the same attention to detail in user experience as in the underlying logic. Good UX builds trust, and visual polish reflects the quality of the entire application.
+
+**Benefits:**
+
+- Portfolio-quality presentation showcasing professional UI/UX design standards
+- Clearer user feedback throughout the file upload and comparison workflow
+- Better mobile experience for portfolio viewers and on-the-go use
+- Improved accessibility for users with different needs and devices
+- Maintained security posture (client-side only, no analytics, data never leaves device)
+
+**Security Note:** Added Google Fonts CDN to Content Security Policy for professional typography. This introduces an external dependency but maintains core security principles: no executable scripts from external sources, no tracking, and all data processing remains client-side. See ADR-0004 Amendment for full security analysis.
+
+---
+
 ## Key Learnings
 
 1. **User feedback drives better solutions** - The CSV-to-CSV approach was not in the original plan but became the core feature

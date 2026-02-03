@@ -69,7 +69,7 @@ Operations staff need to quickly **identify and review potential duplicate accou
 5. **Vendor Record Viewing**: Review all processed records for each vendor to verify accuracy
 6. **Data Privacy**: All processing happens client-side - no data ever leaves your browser
 
-See [CHANGELOG.md](./CHANGELOG.md) for the evolution of these features.
+See [CHANGELOG.md](./docs/changelog/CHANGELOG.md) for the evolution of these features.
 
 ### Future Considerations
 

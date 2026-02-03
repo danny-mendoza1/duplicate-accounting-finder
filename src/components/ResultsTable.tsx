@@ -38,18 +38,9 @@ export function ResultsTable({ groups, vendorScope = null, showHeader = true }: 
             <div className="duplicate-group-info">
               Group {idx + 1} • key: <code>{group.key}</code> • count: {group.items.length}
             </div>
-            <table className="duplicate-table">
-              <colgroup>
-                <col style={{ width: '8%' }} />
-                <col style={{ width: '7%' }} />
-                <col style={{ width: '12%' }} />
-                <col style={{ width: '19%' }} />
-                <col style={{ width: '11%' }} />
-                <col style={{ width: '5%' }} />
-                <col style={{ width: '28%' }} />
-                <col style={{ width: '10%' }} />
-              </colgroup>
-              <thead>
+            <div className="table-container">
+              <table className="duplicate-table">
+                <thead>
                 <tr>
                   <th>Src</th>
                   <SortableHeader
@@ -175,7 +166,8 @@ export function ResultsTable({ groups, vendorScope = null, showHeader = true }: 
                   );
                 })}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
         );
       })}
