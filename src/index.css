@@ -1,3 +1,19 @@
+/* Self-hosted variable fonts */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('/duplicate-accounting-finder/fonts/inter-variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/duplicate-accounting-finder/fonts/jetbrains-mono-variable.woff2') format('woff2');
+}
 
 :root {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;

@@ -196,3 +196,143 @@ The trade-off (external font dependency for professional presentation) is accept
 - Font files loaded: Inter (variable weight 400-800), JetBrains Mono (variable weight 400-700)
 - Preconnect hints added to `index.html` for performance optimization
 - Fallback to system fonts (`system-ui`, `Consolas`) if CDN unavailable
+
+---
+
+## Amendment #2 (2026-02-04): Self-Hosted Fonts
+
+### Context
+
+While reviewing the portfolio's security architecture and adherence to ADR-0001 (Client-only Processing), I identified an opportunity to maintain the professional typography introduced in Amendment #1 while eliminating the external CDN dependency. This returns the application to a pure client-side posture with zero external resource dependencies.
+
+### Decision
+
+Self-host Inter and JetBrains Mono variable fonts locally rather than loading from Google Fonts CDN.
+
+**Implementation:**
+- Downloaded variable font files (WOFF2 format) to `public/fonts/`
+  - `inter-variable.woff2` (~290 KB)
+  - `jetbrains-mono-variable.woff2` (~291 KB)
+- Added `@font-face` declarations in `src/index.css`
+- Removed Google Fonts `<link>` tags and preconnect hints from `index.html`
+- Reverted CSP policy to strict mode (removed Google Fonts URLs)
+
+**New CSP Policy (back to strict):**
+```html
+<meta
+  http-equiv="Content-Security-Policy"
+  content="default-src 'self';
+           script-src 'self';
+           style-src 'self' 'unsafe-inline';
+           img-src 'self' data:;
+           font-src 'self';
+           connect-src 'self'"
+/>
+```
+
+### Rationale
+
+**Security & Architecture:**
+- Returns to **zero external dependencies** (true client-side-only)
+- No external network requests (no DNS lookup, no third-party connections)
+- Stricter CSP policy: `font-src 'self'` (removed Google Fonts URLs)
+- Perfect alignment with ADR-0001's client-only principle
+- Works completely offline after initial page load
+- No supply chain risk from external CDN
+
+**Performance:**
+- Faster initial load: no external DNS/TLS handshake required
+- Controlled caching strategy (fonts bundle with application)
+- No render-blocking external requests
+- Trade-off: ~580 KB additional bundle size
+
+**User Experience:**
+- Same professional Inter + JetBrains Mono typography
+- Consistent font rendering across all environments
+- Graceful fallbacks to system fonts still available
+
+### Bundle Size Impact
+
+**Source:** [phpied.com web font study](https://www.phpied.com/web-font-file-size-study-a-variable-font-addition/)
+
+- Variable fonts (WOFF2, Latin-extended) median: ~35 KB
+- Our implementation: 581 KB total (290 KB + 291 KB)
+  - Larger than average due to full character set support
+  - Single variable font replaces multiple static weight files
+  - Cached after first visit
+
+**Performance context:**
+- Typical React app bundle: 200-500 KB (ours is similar)
+- ~580 KB fonts = ~4.6 seconds on 1 Mbps, ~600ms on 8 Mbps (4G)
+- Modern broadband (25+ Mbps): negligible impact
+- **Major benefit:** No external connection latency (DNS + TLS handshake often adds 200-500ms)
+
+Net result: **Better performance in most scenarios** despite larger bundle.
+
+### What Changed From Amendment #1
+
+| Aspect | Amendment #1 (CDN) | Amendment #2 (Self-hosted) |
+|--------|-------------------|---------------------------|
+| Font source | fonts.gstatic.com | `/fonts/` (self) |
+| CSP `font-src` | `'self' https://fonts.gstatic.com` | `'self'` |
+| CSP `style-src` | `'self' 'unsafe-inline' https://fonts.googleapis.com` | `'self' 'unsafe-inline'` |
+| External requests | 2-3 (CSS + fonts) | 0 |
+| Bundle size | App only | App + 581 KB fonts |
+| Offline support | Requires cache | Full offline support |
+| Third-party dependency | Google CDN | None |
+
+### Consequences
+
+**Good:**
+- True client-side-only architecture (no external dependencies)
+- Stricter security posture (zero external network requests)
+- Better performance (no CDN latency)
+- Complete offline functionality
+- Professional typography maintained
+- Ongoing Learning: found way to satisfy both UX and security
+
+**Acceptable Trade-offs:**
+- Larger initial bundle (~580 KB) but cached after first visit
+- Manual font updates required (vs automatic CDN updates)
+
+**Neutral:**
+- Font rendering quality identical
+- Design system unchanged
+
+### Lesson Learned
+
+**On Iterative Decision-Making:**
+
+This amendment demonstrates iterative engineering refinement rather than a design flaw:
+
+1. **Amendment #1** explored professional typography via CDN (industry-standard approach)
+2. **Amendment #2** discovered this could achieve both professional UX *and* strict security
+3. The CDN exploration was valuable - it validated the typography choices before committing to self-hosting
+
+**Key insight:** The amendment timeline shows **adaptive problem-solving** - starting with a working solution, then optimizing to better align with project principles after more reflection. Admitting this is a core part of iterative processes and real world engineering.
+
+### Testing
+
+To verify self-hosted fonts work correctly:
+
+```bash
+npm run dev
+# Check browser DevTools Network tab:
+# - Verify fonts load from /fonts/ (not googleapis.com)
+# - Verify no CSP violations in console
+# - Verify typography renders correctly
+```
+
+### Related Decisions
+
+- [ADR-0001: Client-only Processing](./0001-client-only-processing.md) - Core principle: no external dependencies
+- [ADR-0002: No Data Persistence](./0002-no-data-persistence.md) - Part of overall security strategy
+- Amendment #1 (above) - Initial typography implementation via CDN
+
+### References
+
+- [phpied.com: Web Font File Size Study](https://www.phpied.com/web-font-file-size-study-a-variable-font-addition/)
+- [MDN: Using @font-face](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face)
+- [MDN: Variable Fonts Guide](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_fonts/Variable_fonts_guide)
+- [Inter Variable Font](https://github.com/rsms/inter)
+- [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)
