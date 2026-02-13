@@ -91,47 +91,6 @@
   background-color: var(--bg-primary);
 }
 
-[data-theme='light'] {
-  color-scheme: light;
-
-  /* Backgrounds */
-  --bg-primary: hsl(0 0% 100%);       /* Pure white */
-  --bg-secondary: hsl(220 13% 97%);   /* Light gray for cards */
-  --bg-tertiary: hsl(220 13% 95%);    /* Muted sections */
-  --bg-hover: hsl(220 13% 93%);       /* Hover state */
-
-  /* Text */
-  --text-primary: hsl(222 47% 11%);   /* Dark blue (inverted bg) */
-  --text-secondary: hsl(215 20% 40%); /* Gray text */
-  --text-tertiary: hsl(215 20% 55%);  /* Disabled/subtle text */
-
-  /* Borders */
-  --border-primary: hsl(220 13% 91%);
-  --border-subtle: hsl(220 13% 95%);
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-glow: 0 0 40px hsl(262 83% 65% / 0.15);
-
-  /* Type colors for Bills vs EFT vs Other (darker for light bg) */
-  --color-bill: hsl(142 70% 35%);     /* Dark green */
-  --color-eft: hsl(189 95% 40%);      /* Dark cyan */
-  --color-other: hsl(0 84% 50%);      /* Dark red */
-
-  /* Row backgrounds */
-  --bg-row-bills: hsl(220 13% 98%);
-  --bg-row-buildium: hsl(220 13% 96%);
-
-  /* Focus */
-  --color-focus: var(--accent-purple);
-
-  /* Apply colors */
-  color: var(--text-primary);
-  background-color: var(--bg-primary);
-}
-
 
 * {
   box-sizing: border-box;

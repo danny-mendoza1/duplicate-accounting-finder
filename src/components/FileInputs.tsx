@@ -6,6 +6,8 @@ interface FileInputsProps {
   isRunning: boolean;
   loadingMessage?: string;
   onRun: () => void;
+  onReset?: () => void;
+  showReset?: boolean;
 }
 
 // Helper to truncate long filenames
@@ -26,6 +28,8 @@ export function FileInputs({
   isRunning,
   loadingMessage,
   onRun,
+  onReset,
+  showReset = false,
 }: FileInputsProps) {
   const [billsFile, setBillsFile] = useState<File | null>(null);
   const [buildiumFile, setBuildiumFile] = useState<File | null>(null);
@@ -59,6 +63,21 @@ export function FileInputs({
     if (buildiumInputRef.current) {
       buildiumInputRef.current.value = '';
     }
+  };
+
+  const handleReset = () => {
+    setBillsFile(null);
+    setBuildiumFile(null);
+    
+    if (billsInputRef.current) {
+      billsInputRef.current.value = '';
+    }
+    if (buildiumInputRef.current) {
+      buildiumInputRef.current.value = '';
+    }
+    
+    // Call parent reset handler
+    onReset?.();
   };
 
   return (
@@ -163,6 +182,16 @@ export function FileInputs({
         >
           {isRunning ? 'Running…' : 'Find duplicates'}
         </button>
+        {showReset && (
+          <button
+            onClick={handleReset}
+            disabled={isRunning}
+            className="secondary-button"
+            title="Clear all files and results"
+          >
+            Reset
+          </button>
+        )}
         <span className="button-hint">or press Ctrl+Enter</span>
         {isRunning && loadingMessage && (
           <div role="status" aria-live="polite" className="loading-message">

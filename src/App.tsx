@@ -1,9 +1,11 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTheme, useFileProcessing, useDuplicateDetection } from './hooks';
 import { ErrorDisplay, FileInputs, InvalidBillsLog, VendorAccordion } from './components';
+import { loadDemoFiles } from './helpers';
 import './App.css';
 
 export default function App() {
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const {
     csvFile,
@@ -32,6 +34,38 @@ export default function App() {
 
     findDuplicates(result.billsRecords, result.buildiumRecords);
   }, [csvFile, buildiumCsvFile, parseFiles, findDuplicates, resetDuplicates]);
+
+  const handleRunDemo = async () => {
+    setIsDemoLoading(true);
+    resetDuplicates();
+    
+    try {
+      const { billsFile, buildiumFile } = await loadDemoFiles();
+      
+      setCsvFile(billsFile);
+      setBuildiumCsvFile(buildiumFile);
+      
+      const result = await parseFiles(billsFile, buildiumFile);
+      if (result) {
+        findDuplicates(result.billsRecords, result.buildiumRecords);
+      }
+    } catch (error) {
+      console.error('Failed to load demo files:', error);
+    } finally {
+      setIsDemoLoading(false);
+    }
+  };
+
+  const handleReset = useCallback(() => {
+    setCsvFile(null);
+    setBuildiumCsvFile(null);
+    
+    resetDuplicates();
+  }, [setCsvFile, setBuildiumCsvFile, resetDuplicates]);
+
+  const hasFiles = csvFile !== null || buildiumCsvFile !== null;
+  const hasResults = vendorGroups.length > 0 || vendorsWithoutDuplicates.length > 0 || invalidBills.length > 0;
+  const shouldShowReset = hasFiles || hasResults || error !== null;
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -63,6 +97,14 @@ export default function App() {
             <p className="app-subtitle">
               Upload both CSV files, then run detection to find duplicates.
             </p>
+            <button 
+              className="file-input-button"
+              onClick={handleRunDemo}
+              disabled={isDemoLoading || isRunning}
+              aria-busy={isDemoLoading}
+            >
+              {isDemoLoading ? 'Running demo…' : 'Or run a demo scenario'}
+            </button>
           </header>
 
           <FileInputs
@@ -71,6 +113,8 @@ export default function App() {
             isRunning={isRunning}
             loadingMessage={loadingMessage}
             onRun={handleRun}
+            onReset={handleReset}
+            showReset={shouldShowReset}
           />
 
           <ErrorDisplay error={error} />
