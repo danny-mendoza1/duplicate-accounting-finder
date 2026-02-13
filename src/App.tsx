@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useTheme, useFileProcessing, useDuplicateDetection } from './hooks';
+import { useFileProcessing, useDuplicateDetection } from './hooks';
 import { ErrorDisplay, FileInputs, InvalidBillsLog, VendorAccordion } from './components';
 import { loadDemoFiles } from './helpers';
 import './App.css';
 
 export default function App() {
   const [isDemoLoading, setIsDemoLoading] = useState(false);
-  const { theme, toggleTheme } = useTheme();
   const {
     csvFile,
     setCsvFile,
@@ -81,15 +80,6 @@ export default function App() {
 
   return (
     <>
-      <button
-        onClick={toggleTheme}
-        title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-        className="theme-toggle"
-        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-      >
-        {theme === 'dark' ? '☀️' : '🌙'}
-      </button>
-
       <div className="app-container">
         <div className="content-wrapper">
           <header className="app-header">

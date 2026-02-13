@@ -56,7 +56,8 @@ Operations staff need to quickly **identify and review potential duplicate accou
 - **Static hosting** (GitHub Pages) - no server means no data transmission.
 - **Strict Content Security Policy (CSP)** - prevents XSS attacks by restricting script sources.
 - **No telemetry** - no analytics or tracking of any kind.
-- **No data persistence** - data exists only while the page is open.
+- **No data persistence** - data exists only while the page is open (no localStorage, no cookies).
+- **Demo feature** - Optional demo loads static CSV files from same origin for portfolio demonstration (no external APIs or data transmission).
 
 ---
 
