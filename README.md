@@ -139,7 +139,7 @@ This project uses lightweight, pragmatic project management:
 - **GitHub Actions** for automated CI/CD (typecheck, lint, tests, deployment)
 - **Milestones** for grouping related features and tracking major releases
 
-See [CHANGELOG.md](./docs/changelog/CHANGELOG.md) for the evolution of features and the decision-making process behind major changes.
+See [CHANGELOG](./docs/changelog/CHANGELOG.md) for the evolution of features and the decision-making process behind major changes.
 
 ---
 

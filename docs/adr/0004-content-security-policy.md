@@ -150,10 +150,10 @@ Added Google Fonts CDN to CSP policy:
 - Network requests made on page load (fonts only, HTTPS)
 
 **What Didn't Change:**
-- ✅ No executable scripts from external sources (`script-src 'self'` unchanged)
-- ✅ All data processing remains client-side
-- ✅ No analytics or tracking
-- ✅ No user data transmission
+- No executable scripts from external sources (`script-src 'self'` unchanged)
+- All data processing remains client-side
+- No analytics or tracking
+- No user data transmission
 
 ### Consequences
 
@@ -178,11 +178,11 @@ Added Google Fonts CDN to CSP policy:
 
 This exception maintains the **spirit and core goals** of the original ADR-0004 decision:
 
-1. ✅ **No malicious code execution** - Fonts are static assets, not executable
-2. ✅ **No data leakage** - Font requests don't include user data
-3. ✅ **No tracking** - Google Fonts requests are anonymous
-4. ✅ **Security-first approach maintained** - Core protections (`script-src 'self'`) unchanged
-5. ✅ **Defense in depth** - XSS protections remain fully intact
+1. **No malicious code execution** - Fonts are static assets, not executable
+2. **No data leakage** - Font requests don't include user data
+3. **No tracking** - Google Fonts requests are anonymous
+4. **Security-first approach maintained** - Core protections (`script-src 'self'`) unchanged
+5. **Defense in depth** - XSS protections remain fully intact
 
 The trade-off (external font dependency for professional presentation) is acceptable given:
 - Application's production-validated security model over several months
@@ -303,13 +303,11 @@ Net result: **Better performance in most scenarios** despite larger bundle.
 
 **On Iterative Decision-Making:**
 
-This amendment demonstrates iterative engineering refinement rather than a design flaw:
+This amendment demonstrates the iterative process:
 
 1. **Amendment #1** explored professional typography via CDN (industry-standard approach)
 2. **Amendment #2** discovered this could achieve both professional UX *and* strict security
-3. The CDN exploration was valuable - it validated the typography choices before committing to self-hosting
-
-**Key insight:** The amendment timeline shows **adaptive problem-solving** - starting with a working solution, then optimizing to better align with project principles after more reflection. Admitting this is a core part of iterative processes and real world engineering.
+3. The CDN exploration was valuable because it validated the typography choices before committing to self-hosting
 
 ### Testing
 
