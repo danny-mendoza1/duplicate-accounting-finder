@@ -222,4 +222,4 @@ This project evolved organically based on real user needs and constraints. Rathe
 
 ## Technical Decisions
 
-For architectural decisions and their rationale, see the [Architecture Decision Records](./docs/adr) directory.
+For architectural decisions and their rationale, see the [Architecture Decision Records](../../docs/adr) directory.

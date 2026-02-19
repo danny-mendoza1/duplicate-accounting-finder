@@ -51,7 +51,7 @@ Export functionality was initially included in the MVP scope based on an assumpt
 3. They don't need or want permanent records of comparisons
 4. The comparison is part of their workflow, not an output of it
 
-This is a perfect example of **validating assumptions before building**. What seemed like an obvious feature requirement turned out to be unnecessary complexity.
+This helped me enforce a **validate assumptions before building** attitude. What seemed like an obvious feature requirement turned out to be unnecessary complexity.
 
 ## User Workflow
 
