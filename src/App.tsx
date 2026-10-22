@@ -37,13 +37,13 @@ export default function App() {
   const handleRunDemo = async () => {
     setIsDemoLoading(true);
     resetDuplicates();
-    
+
     try {
       const { billsFile, buildiumFile } = await loadDemoFiles();
-      
+
       setCsvFile(billsFile);
       setBuildiumCsvFile(buildiumFile);
-      
+
       const result = await parseFiles(billsFile, buildiumFile);
       if (result) {
         findDuplicates(result.billsRecords, result.buildiumRecords);
@@ -58,12 +58,13 @@ export default function App() {
   const handleReset = useCallback(() => {
     setCsvFile(null);
     setBuildiumCsvFile(null);
-    
+
     resetDuplicates();
   }, [setCsvFile, setBuildiumCsvFile, resetDuplicates]);
 
   const hasFiles = csvFile !== null || buildiumCsvFile !== null;
-  const hasResults = vendorGroups.length > 0 || vendorsWithoutDuplicates.length > 0 || invalidBills.length > 0;
+  const hasResults =
+    vendorGroups.length > 0 || vendorsWithoutDuplicates.length > 0 || invalidBills.length > 0;
   const shouldShowReset = hasFiles || hasResults || error !== null;
 
   useEffect(() => {
@@ -87,7 +88,7 @@ export default function App() {
             <p className="app-subtitle">
               Upload both CSV files, then run detection to find duplicates.
             </p>
-            <button 
+            <button
               className="file-input-button"
               onClick={handleRunDemo}
               disabled={isDemoLoading || isRunning}

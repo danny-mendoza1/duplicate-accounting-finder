@@ -35,6 +35,7 @@ For portfolio demonstration purposes, a demo feature was added to allow visitors
 ### Decision
 
 The demo feature fetches two static CSV files from the same origin using the Fetch API:
+
 - `/duplicate-accounting-finder/Buildium-Export-Demo-File.csv`
 - `/duplicate-accounting-finder/Bills-To-Enter-Demo-File.csv`
 
@@ -64,21 +65,23 @@ const [buildiumResponse, billsResponse] = await Promise.all([
 
 ### Security Analysis
 
-| Aspect | User Upload Flow | Demo File Flow | Compliance |
-|--------|-----------------|----------------|------------|
-| Data source | User's device | Application bundle (same origin) | Equal |
-| Network transmission | None | Same-origin static file fetch | Equal |
-| Processing location | Client browser | Client browser | Equal |
-| Data persistence | In-memory only | In-memory only | Equal |
-| External dependencies | None | None | Equal |
+| Aspect                | User Upload Flow | Demo File Flow                   | Compliance |
+| --------------------- | ---------------- | -------------------------------- | ---------- |
+| Data source           | User's device    | Application bundle (same origin) | Equal      |
+| Network transmission  | None             | Same-origin static file fetch    | Equal      |
+| Processing location   | Client browser   | Client browser                   | Equal      |
+| Data persistence      | In-memory only   | In-memory only                   | Equal      |
+| External dependencies | None             | None                             | Equal      |
 
 ### What Changed
 
 **Added:**
+
 - Network requests to fetch demo CSV files from same origin
 - Demo button that loads files and auto-runs duplicate detection
 
 **Unchanged:**
+
 - No user data leaves the device
 - All processing remains client-side
 - No external API calls

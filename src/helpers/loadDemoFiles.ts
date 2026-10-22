@@ -4,7 +4,7 @@ export async function loadDemoFiles(): Promise<{
 }> {
   try {
     // Fetch both demo files from the public directory
-    // Note: In development, files are at root. In production with base path, 
+    // Note: In development, files are at root. In production with base path,
     // Vite automatically handles the path resolution for public assets
     const [buildiumResponse, billsResponse] = await Promise.all([
       fetch('/duplicate-accounting-finder/Buildium-Export-Demo-File.csv'),
@@ -20,16 +20,10 @@ export async function loadDemoFiles(): Promise<{
       billsResponse.blob(),
     ]);
 
-    const buildiumFile = new File(
-      [buildiumBlob],
-      'Buildium-Export-Demo-File.csv',
-      { type: 'text/csv' }
-    );
-    const billsFile = new File(
-      [billsBlob],
-      'Bills-To-Enter-Demo-File.csv',
-      { type: 'text/csv' }
-    );
+    const buildiumFile = new File([buildiumBlob], 'Buildium-Export-Demo-File.csv', {
+      type: 'text/csv',
+    });
+    const billsFile = new File([billsBlob], 'Bills-To-Enter-Demo-File.csv', { type: 'text/csv' });
 
     return { billsFile, buildiumFile };
   } catch (error) {

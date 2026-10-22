@@ -13,12 +13,12 @@ interface FileInputsProps {
 // Helper to truncate long filenames
 function truncateFilename(filename: string, maxLength: number = 30): string {
   if (filename.length <= maxLength) return filename;
-  
+
   const extension = filename.slice(filename.lastIndexOf('.'));
   const nameWithoutExt = filename.slice(0, filename.lastIndexOf('.'));
   const keepStart = Math.floor((maxLength - extension.length - 3) * 0.6);
   const keepEnd = Math.floor((maxLength - extension.length - 3) * 0.4);
-  
+
   return `${nameWithoutExt.slice(0, keepStart)}...${nameWithoutExt.slice(-keepEnd)}${extension}`;
 }
 
@@ -33,7 +33,7 @@ export function FileInputs({
 }: FileInputsProps) {
   const [billsFile, setBillsFile] = useState<File | null>(null);
   const [buildiumFile, setBuildiumFile] = useState<File | null>(null);
-  
+
   const billsInputRef = useRef<HTMLInputElement>(null);
   const buildiumInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,14 +68,14 @@ export function FileInputs({
   const handleReset = () => {
     setBillsFile(null);
     setBuildiumFile(null);
-    
+
     if (billsInputRef.current) {
       billsInputRef.current.value = '';
     }
     if (buildiumInputRef.current) {
       buildiumInputRef.current.value = '';
     }
-    
+
     // Call parent reset handler
     onReset?.();
   };
@@ -99,15 +99,14 @@ export function FileInputs({
           <label htmlFor="bills-csv-input" className="file-input-button">
             Choose File
           </label>
-          
+
           <div className="file-status">
             {billsFile ? (
               <>
-                <span className="file-status-icon" aria-label="File uploaded">✓</span>
-                <span 
-                  className="file-status-name" 
-                  title={billsFile.name}
-                >
+                <span className="file-status-icon" aria-label="File uploaded">
+                  ✓
+                </span>
+                <span className="file-status-name" title={billsFile.name}>
                   {truncateFilename(billsFile.name)}
                 </span>
                 <button
@@ -144,15 +143,14 @@ export function FileInputs({
           <label htmlFor="buildium-csv-input" className="file-input-button">
             Choose File
           </label>
-          
+
           <div className="file-status">
             {buildiumFile ? (
               <>
-                <span className="file-status-icon" aria-label="File uploaded">✓</span>
-                <span 
-                  className="file-status-name"
-                  title={buildiumFile.name}
-                >
+                <span className="file-status-icon" aria-label="File uploaded">
+                  ✓
+                </span>
+                <span className="file-status-name" title={buildiumFile.name}>
                   {truncateFilename(buildiumFile.name)}
                 </span>
                 <button

@@ -119,6 +119,7 @@ Added Google Fonts CDN to CSP policy:
 ```
 
 **Changes from original policy:**
+
 - `style-src`: Added `https://fonts.googleapis.com` (for font CSS)
 - `font-src`: Added `https://fonts.gstatic.com` (for font files)
 
@@ -137,19 +138,21 @@ Added Google Fonts CDN to CSP policy:
 
 **Risk Assessment:**
 
-| Risk Type | Impact | Mitigation |
-|-----------|--------|------------|
-| XSS/Injection attacks | No change | Fonts cannot execute code |
-| Data exfiltration | No change | No user data transmitted in font requests |
-| Privacy | No change | Font requests are anonymous, no tracking |
-| Availability | Low | Browser caching + system font fallbacks |
-| Supply chain | Very low | Google Fonts widely trusted, HTTPS-only |
+| Risk Type             | Impact    | Mitigation                                |
+| --------------------- | --------- | ----------------------------------------- |
+| XSS/Injection attacks | No change | Fonts cannot execute code                 |
+| Data exfiltration     | No change | No user data transmitted in font requests |
+| Privacy               | No change | Font requests are anonymous, no tracking  |
+| Availability          | Low       | Browser caching + system font fallbacks   |
+| Supply chain          | Very low  | Google Fonts widely trusted, HTTPS-only   |
 
 **What Changed:**
+
 - External dependency introduced (fonts.googleapis.com, fonts.gstatic.com)
 - Network requests made on page load (fonts only, HTTPS)
 
 **What Didn't Change:**
+
 - No executable scripts from external sources (`script-src 'self'` unchanged)
 - All data processing remains client-side
 - No analytics or tracking
@@ -158,17 +161,20 @@ Added Google Fonts CDN to CSP policy:
 ### Consequences
 
 **Good:**
+
 - Professional typography improves portfolio presentation quality
 - Fast CDN delivery with widespread browser caching
 - Industry-standard fonts (Inter, JetBrains Mono) improve readability
 - Demonstrates attention to design detail matching code quality
 
 **Bad:**
+
 - External dependency on Google's infrastructure
 - Small deviation from "no third-party resources" principle
 - Network requests required on page load (minimal, fonts only)
 
 **Mitigations:**
+
 - HTTPS-only connections prevent man-in-the-middle attacks
 - Could add Subresource Integrity (SRI) hashes in future for additional validation
 - Could self-host fonts later if Google CDN becomes a concern
@@ -185,6 +191,7 @@ This exception maintains the **spirit and core goals** of the original ADR-0004 
 5. **Defense in depth** - XSS protections remain fully intact
 
 The trade-off (external font dependency for professional presentation) is acceptable given:
+
 - Application's production-validated security model over several months
 - Portfolio context requiring professional design standards
 - Minimal security impact (fonts cannot compromise data or execute code)
@@ -210,6 +217,7 @@ While reviewing the portfolio's security architecture and adherence to ADR-0001 
 Self-host Inter and JetBrains Mono variable fonts locally rather than loading from Google Fonts CDN.
 
 **Implementation:**
+
 - Downloaded variable font files (WOFF2 format) to `public/fonts/`
   - `inter-variable.woff2` (~290 KB)
   - `jetbrains-mono-variable.woff2` (~291 KB)
@@ -218,6 +226,7 @@ Self-host Inter and JetBrains Mono variable fonts locally rather than loading fr
 - Reverted CSP policy to strict mode (removed Google Fonts URLs)
 
 **New CSP Policy (back to strict):**
+
 ```html
 <meta
   http-equiv="Content-Security-Policy"
@@ -233,6 +242,7 @@ Self-host Inter and JetBrains Mono variable fonts locally rather than loading fr
 ### Rationale
 
 **Security & Architecture:**
+
 - Returns to **zero external dependencies** (true client-side-only)
 - No external network requests (no DNS lookup, no third-party connections)
 - Stricter CSP policy: `font-src 'self'` (removed Google Fonts URLs)
@@ -241,12 +251,14 @@ Self-host Inter and JetBrains Mono variable fonts locally rather than loading fr
 - No supply chain risk from external CDN
 
 **Performance:**
+
 - Faster initial load: no external DNS/TLS handshake required
 - Controlled caching strategy (fonts bundle with application)
 - No render-blocking external requests
 - Trade-off: ~580 KB additional bundle size
 
 **User Experience:**
+
 - Same professional Inter + JetBrains Mono typography
 - Consistent font rendering across all environments
 - Graceful fallbacks to system fonts still available
@@ -262,6 +274,7 @@ Self-host Inter and JetBrains Mono variable fonts locally rather than loading fr
   - Cached after first visit
 
 **Performance context:**
+
 - Typical React app bundle: 200-500 KB (ours is similar)
 - ~580 KB fonts = ~4.6 seconds on 1 Mbps, ~600ms on 8 Mbps (4G)
 - Modern broadband (25+ Mbps): negligible impact
@@ -271,19 +284,20 @@ Net result: **Better performance in most scenarios** despite larger bundle.
 
 ### What Changed From Amendment #1
 
-| Aspect | Amendment #1 (CDN) | Amendment #2 (Self-hosted) |
-|--------|-------------------|---------------------------|
-| Font source | fonts.gstatic.com | `/fonts/` (self) |
-| CSP `font-src` | `'self' https://fonts.gstatic.com` | `'self'` |
-| CSP `style-src` | `'self' 'unsafe-inline' https://fonts.googleapis.com` | `'self' 'unsafe-inline'` |
-| External requests | 2-3 (CSS + fonts) | 0 |
-| Bundle size | App only | App + 581 KB fonts |
-| Offline support | Requires cache | Full offline support |
-| Third-party dependency | Google CDN | None |
+| Aspect                 | Amendment #1 (CDN)                                    | Amendment #2 (Self-hosted) |
+| ---------------------- | ----------------------------------------------------- | -------------------------- |
+| Font source            | fonts.gstatic.com                                     | `/fonts/` (self)           |
+| CSP `font-src`         | `'self' https://fonts.gstatic.com`                    | `'self'`                   |
+| CSP `style-src`        | `'self' 'unsafe-inline' https://fonts.googleapis.com` | `'self' 'unsafe-inline'`   |
+| External requests      | 2-3 (CSS + fonts)                                     | 0                          |
+| Bundle size            | App only                                              | App + 581 KB fonts         |
+| Offline support        | Requires cache                                        | Full offline support       |
+| Third-party dependency | Google CDN                                            | None                       |
 
 ### Consequences
 
 **Good:**
+
 - True client-side-only architecture (no external dependencies)
 - Stricter security posture (zero external network requests)
 - Better performance (no CDN latency)
@@ -292,10 +306,12 @@ Net result: **Better performance in most scenarios** despite larger bundle.
 - Ongoing Learning: found way to satisfy both UX and security
 
 **Acceptable Trade-offs:**
+
 - Larger initial bundle (~580 KB) but cached after first visit
 - Manual font updates required (vs automatic CDN updates)
 
 **Neutral:**
+
 - Font rendering quality identical
 - Design system unchanged
 
@@ -306,7 +322,7 @@ Net result: **Better performance in most scenarios** despite larger bundle.
 This amendment demonstrates the iterative process:
 
 1. **Amendment #1** explored professional typography via CDN (industry-standard approach)
-2. **Amendment #2** discovered this could achieve both professional UX *and* strict security
+2. **Amendment #2** discovered this could achieve both professional UX _and_ strict security
 3. The CDN exploration was valuable because it validated the typography choices before committing to self-hosting
 
 ### Testing

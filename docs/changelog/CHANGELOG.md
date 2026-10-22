@@ -146,6 +146,7 @@ This project evolved organically based on real user needs and constraints. Rathe
 **Implementation:** Demo feature and security compliance corrections
 
 **Demo Feature:**
+
 - Added "Or run a demo scenario" button to header
 - Loads sample CSV files from `public/` directory via same-origin fetch
 - Auto-runs duplicate detection with demo data
@@ -153,20 +154,22 @@ This project evolved organically based on real user needs and constraints. Rathe
 - Demo files: `Buildium-Export-Demo-File.csv` and `Bills-To-Enter-Demo-File.csv`
 
 **Security Compliance Fixes:**
+
 - **Removed theme toggle and localStorage**: ADR-0002 explicitly prohibits data persistence. Theme toggle used localStorage to remember user preference, violating this principle. Application now defaults to dark mode only.
 - **Removed light theme**: Simplified to single dark theme, eliminating persistence requirement
-- **Documentation updates**: 
+- **Documentation updates**:
   - Updated README to clarify "no data persistence" includes no localStorage/cookies
   - Amended ADR-0001 to explain demo file fetching
   - Updated CHANGELOG to document security compliance corrections
 
-**Rationale:** 
+**Rationale:**
 
 **Demo Feature:** Portfolio visitors need to quickly see the application in action without uploading their own files. The demo feature provides immediate value demonstration while maintaining security principles (same-origin fetch of static assets, no external APIs, no data transmission).
 
 **Security Compliance:** During documentation review, localStorage usage for theme preference was identified as violating ADR-0002's "no data persistence" principle. While theme preference might seem harmless, maintaining strict adherence to documented security principles builds trust and demonstrates consistency between documentation and implementation.
 
 **Benefits:**
+
 - **Improved portfolio presentation**: One-click demo showcases functionality immediately
 - **Documentation accuracy**: Claims match implementation
 - **Stricter security posture**: Zero browser storage, zero data persistence
