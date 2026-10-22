@@ -54,12 +54,11 @@
   .app-title {
     font-size: 1.875rem;
   }
-  
+
   .app-subtitle {
     font-size: 0.9rem;
   }
 }
-
 
 .file-inputs-section {
   display: grid;
@@ -217,7 +216,6 @@
   flex-wrap: wrap;
   margin-top: var(--space-sm);
 }
-
 
 .primary-button {
   background: var(--accent-purple-muted);
@@ -400,7 +398,6 @@
   padding: var(--space-lg);
 }
 
-
 .duplicate-group-card {
   border: 1px solid var(--border-primary);
   border-radius: 1rem;
@@ -424,20 +421,27 @@
   font-family: var(--font-mono);
 }
 
-
 .table-container {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin: 0 calc(-1 * var(--space-md));
   padding: 0 var(--space-md);
-  background: 
-    linear-gradient(to right, var(--bg-primary) 30%, rgba(0,0,0,0)),
-    linear-gradient(to right, rgba(0,0,0,0), var(--bg-primary) 70%) 0 100%,
-    radial-gradient(farthest-side at 0 50%, rgba(156, 163, 175, 0.3), rgba(0,0,0,0)),
-    radial-gradient(farthest-side at 100% 50%, rgba(156, 163, 175, 0.3), rgba(0,0,0,0)) 0 100%;
+  background:
+    linear-gradient(to right, var(--bg-primary) 30%, rgba(0, 0, 0, 0)),
+    linear-gradient(to right, rgba(0, 0, 0, 0), var(--bg-primary) 70%) 0 100%,
+    radial-gradient(farthest-side at 0 50%, rgba(156, 163, 175, 0.3), rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(156, 163, 175, 0.3), rgba(0, 0, 0, 0)) 0 100%;
   background-repeat: no-repeat;
-  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
-  background-position: 0 0, 100%, 0 0, 100%;
+  background-size:
+    40px 100%,
+    40px 100%,
+    14px 100%,
+    14px 100%;
+  background-position:
+    0 0,
+    100%,
+    0 0,
+    100%;
   background-attachment: local, local, scroll, scroll;
 }
 
@@ -690,7 +694,6 @@
   font-size: 0.8125rem;
 }
 
-
 .invalid-bills-log {
   margin-top: var(--space-xl);
   padding: var(--space-lg);
@@ -795,21 +798,21 @@
     align-items: stretch;
     gap: var(--space-sm);
   }
-  
+
   .file-input-button {
     width: 100%;
     text-align: center;
   }
-  
+
   .file-status {
     width: 100%;
   }
-  
+
   /* Always show remove button on mobile (no hover state) */
   .file-status-remove {
     opacity: 1;
   }
-  
+
   .button-hint {
     margin-left: 0;
     width: 100%;
@@ -822,13 +825,13 @@
   .file-input-label-text {
     font-size: 0.8125rem;
   }
-  
+
   .file-input-button,
   .primary-button {
     font-size: 0.8125rem;
     padding: var(--space-sm) var(--space-md);
   }
-  
+
   .file-status {
     font-size: 0.8125rem;
   }

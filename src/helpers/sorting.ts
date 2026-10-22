@@ -28,16 +28,17 @@ export function sortRecordsWithStaticFirst(
       case 'type':
         comparison = a.typeRaw.localeCompare(b.typeRaw);
         break;
-        
+
       case 'date': {
         const dateA = String(getRaw(a.raw, BUILDIUM_CSV_COLUMNS.date) ?? '');
         const dateB = String(getRaw(b.raw, BUILDIUM_CSV_COLUMNS.date) ?? '');
         const timeA = new Date(dateA).getTime();
         const timeB = new Date(dateB).getTime();
-        
+
         // Handle invalid dates (NaN) by treating them as equal
         if (isNaN(timeA) && isNaN(timeB)) comparison = 0;
-        else if (isNaN(timeA)) comparison = 1; // Invalid dates sort to end
+        else if (isNaN(timeA))
+          comparison = 1; // Invalid dates sort to end
         else if (isNaN(timeB)) comparison = -1;
         else comparison = timeA - timeB;
         break;
